@@ -41,3 +41,6 @@ You may have to add an SSH key to your account as a security measure - GitHub wi
 If you have a computer running a form of GNU/Linux or BSD, you probably know what you are doing and don't need to read this.
 
 At home you can use the desktop application or the terminal commands, whichever is most convenient for you.  At University though you will need to use the terminal commands so it may be best if you learn how to correctly perform changes to the project at home so stuff gets done.
+
+## Uploading Changes in General
+Please make sure that whenever you are about to commit and push your changes, you have the most recent version of the project.  If this is not the case and you push changes, I do not entirely know what will happen but I think it creates a separate branch, which I will have to try and merge without conflicts.
