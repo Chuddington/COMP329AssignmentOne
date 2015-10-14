@@ -2,15 +2,15 @@
 2015 Robotics Assignment - Basics of Environment Mapping and Exploration
 
 ## Obtaining the Project from the University Computers
-Variables will be denoted with square brackets '<Variable>'
+Variables will be denoted with hyphens '-Variable-'
 
-1. Open command prompt; cd /D <WhereYouWantTheFolderToDownloadTo>
+1. Open command prompt; cd /D -WhereYouWantTheFolderToDownloadTo-
 
 2. If you haven't already, initialise your settings on the uni computer
 
-    * git config --global user.name "<YourUserName>"
+    * git config --global user.name "-YourUserName-"
     
-    * git config --global user.email "<YourEmailAddress>"
+    * git config --global user.email "-YourEmailAddress-"
     
 3. git clone https://github.com/Chuddington/COMP329AssignmentOne
 
@@ -21,7 +21,7 @@ Once you've finished editing files and wish to commit them, open command prompt:
 
 2. git add .
 
-3. git commit -m "<CommentOfTheChangesMade>"
+3. git commit -m "-CommentOfTheChangesMade-"
 
 4. git push
 
@@ -34,9 +34,7 @@ Once you've finished editing files and wish to commit them, open command prompt:
     4. if done correctly, the changes will be uploaded
 
 ## Editing/Obtaining the project whilst at home
-If you're running a windows OS or Mac OS X, obtaining the GitHub desktop application is probably the best way of accessing the project:
-
-[GitHub Desktop Application](https://desktop.github.com/)
+If you're running a windows OS or Mac OS X, obtaining the [GitHub Desktop Application](https://desktop.github.com/) is probably the best way of accessing the project:
 
 You may have to add an SSH key to your account as a security measure - GitHub will tell you if this is the case and how you can go about doing it.
 
