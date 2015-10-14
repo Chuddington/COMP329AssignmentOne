@@ -12,7 +12,7 @@ public class Mover {
     static void    someVarHere   = 0   ;
     static int     someIntVar    = 0   ;
     static String  someStringVar = ""  ;
-    static Boolean isEmpty       = true;
+    static boolean isEmpty       = true;
 
     Mover(int a, int b, String c) {
         //constructor class

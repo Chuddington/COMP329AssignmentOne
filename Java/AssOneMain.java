@@ -12,7 +12,7 @@ public class AssOneMain {
     static void    someVarHere   = 0   ;
     static int     someIntVar    = 0   ;
     static String  someStringVar = ""  ;
-    static Boolean isEmpty       = true;
+    static boolean isEmpty       = true;
 
     public static int main(String[] args) {
     
