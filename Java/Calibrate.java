@@ -5,8 +5,7 @@
  
 //import statements here
 import lejos.nxt.*;
-import lejos.robotics.navigation.DifferentialPilot;
-import lejos.robotics.localization.OdometryPoseProvider; 
+import lejos.robotics.*;
  
 public class Calibrate {
  
@@ -20,6 +19,26 @@ public class Calibrate {
         //constructor class
     }
     
+    private static void chkArenaSize() {
+      //variable to store movement data
+      Pose  pObj       = new Pose(0.0, 0.0, 0);
+
+      TouchSensor lBmp = new TouchSensor(SensorPort.S2);
+      TouchSensor rBmp = new TouchSensor(SensorPort.S1);
+
+      Motor.B.forward();
+      Motor.C.forward();
+
+      //wait until it bumps into something
+      while(!lBmp.isPressed() || !rBmp.isPressed() ) {
+      }
+
+      Motor.B.stop();
+      Motor.C.stop();
+      
+
+
+    }
     private static void chkFwdMovement(MotorObj mV) {
         //Should test forward movement so that there are no leaning sideways
         //method should be recursive to allow changing variables whilst running
