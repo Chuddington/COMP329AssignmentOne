@@ -1,11 +1,10 @@
 // Movement class
 //
-// The concept of it all is very basic, but I'm gonna go to labs 
-//and have a play with it tomorrow, see if I can get it to work
+// 
 //
 // Simple program to move around the arena. 
-// Parameters need working out though, just the size of the arena really
-//
+// Assuming 10x 5 arena size 
+// Includes a small calibration method for the rotation
 //
 
 
@@ -20,11 +19,10 @@ public class Movement {
 	
 	public int dist = 25;	//Size of the robot, uses in the travel method to move one cell
 	public int degree = 90;	//Can set the rotation value after calibration
-	public int length, width;	//These need values, for as many cells as there are
-	public static int x, y;
+	public int length = 10;	//These need values, for as many cells as there are
+	public int width = 5;	//These need values, for as many cells as there are
 	public bool right;
-	public int columns; 	//Will be set once pairs of movement are measured 
-	public int[][] arena = new int[10][10] //However big the arena is
+	
 	
 	public static void main(String[] args){
 	
@@ -38,7 +36,7 @@ public class Movement {
 	
 		//Assuming we start at the bottom left hand corner, pointing upwards
 		
-		for(int i = 0; i < columns; i++){
+		for(int i = 0; i < 2; i++){
 		
 		moveUp();								//For loop will move the robot up to the end
 		right = true;							//Turn to the next cell over and move back down
@@ -52,7 +50,7 @@ public class Movement {
 		rotate(right);
 		
 		}
-	
+		moveUp();
 	}
 	
 	public void moveUp(){
@@ -64,8 +62,8 @@ public class Movement {
 		//Use opp.getPose() to get coordinates of the current location
 		//Use RConsole to print to PC
 		
-		arena[x][i] = 0;		//Nothing in the cell, set value to 0
-		y = i;					//keeping track of the Y coordinate
+		//Nothing in the cell, set value to 0
+		//keeping track of the Y coordinate
 		
 		//Method to check for obstacles in the next cell called here
 		}
@@ -79,9 +77,7 @@ public class Movement {
 			
 			//Can use opp.getPose() again to get coordinates
 			//Check for obstacles in next cell here
-			
-			arena[x][i];
-			y = i;
+			//Update values as needed
 		
 		}
 	}
@@ -102,7 +98,6 @@ public class Movement {
 	public void nextCell(){
 	
 		pilot.travel(dist);		//Moves one cell over, used for incrementing the width value of the array
-		x ++;
 			
 	}
 	public void calibrate(){
