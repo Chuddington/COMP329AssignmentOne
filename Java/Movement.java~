@@ -56,15 +56,15 @@ public class Movement {
 		moveUp();
 	}
 	
-	public void moveUp() {
+	public void moveUp(){
 			
-		for(int i = 0; i <= length; i++) {
+		for(int i = 0; i <= length; i++){
 		
 		pilot.travel(dist); //Moves to next cell in the positive Y direction
 		
 		//Use opp.getPose() to get coordinates of the current location
 		//Use RConsole to print to PC
-    btVar.poseToRCon(opp.getPose() ); //parameter may not work - check
+    btVar.poseToRCon(opp.getPose() ); //template - might not work
 		
 		//Nothing in the cell, set value to 0
 		//keeping track of the Y coordinate
@@ -80,30 +80,30 @@ public class Movement {
 			pilot.travel(dist);
 			
 			//Can use opp.getPose() again to get coordinates
-      btVar.poseToRCon(opp.getPose() ); //parameter may not work - check
 			//Check for obstacles in next cell here
 			//Update values as needed
 		
 		}
 	}
-
-  //As to not confuse with the pilot.rotate method
-	public void turn(bool right){	
+	public void turn(bool right){			//As to not confuse with the pilot.rotate method
 	
-		if(right == true) {
-			pilot.rotate(degree) ; //Turns right
+		if(right == true){
+		
+			pilot.rotate(degree);			//Turns right
+		
 		}
-		else {
-			pilot.rotate(-degree); //Turn left		
-		}	
+		else{
+		
+			pilot.rotate(-degree);			//Turn left
+		
+		}
+	
 	}
-
 	public void nextCell(){
 	
-		pilot.travel(dist); //Moves one cell over; increments array width value
+		pilot.travel(dist);		//Moves one cell over, used for incrementing the width value of the array
 			
 	}
-
 	public void calibrate(){
 	
 		TouchSensor leftBump = new TouchSensor(SensorPort.S2);
@@ -111,19 +111,25 @@ public class Movement {
 		
 		System.out.println("Press right bumper to start");
 		
-		if(rightBump.isPressed() ) {
-      rotate(90);
+		if(rightBump.isPressed()){
+		rotate(90);
 		}
-		System.out.println("Increase degree with R.bumper.  L.Bumper to exit");
-		if(rightBump.isPressed() ) {
-			degree + 5; //Increases rotation degree if needed
+		System.out.println("Increase degree with right bumper. Left Bumper to exit");
+		if(rightBump.isPressed()){
+		
+			degree + 5;							//Increases rotation degree if needed
 			System.out.println("Reset the robot to straight");
 			calibrate();
-		}
-		if(leftBump.isPressed() ) {	
+			}
+		if(leftBump.isPressed)){
+		
 			return;
+		
 		}
+		
+	
+	
+	
+	
 	}
-
-
-}
+	}
