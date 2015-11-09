@@ -21,24 +21,26 @@ import lejos.nxt.Motor;
 public class AssOneMain {
  
     //global variables here - templates for now
-    static int columns, numOfRowCells = 0;    
+    static int columns, numOfRowCells = 0;   
+    static MapSystem mapObj = new MapSystem();
+    static BtStuff   btObj  = new BtStuff()  ;
+    static Movement  movObj = new Movement() ;    
 
-    public static int main(String[] args) {
-        
-        //import classes here
-        public MapSystem mapObj = new MapSystem();
-        public BtStuff   btObj  = new BtStuff()  ;
-        public Movement  movObj = new Movement() ;
+    public static void main(String[] args) {
 
-        
+        columns = 5;
+        numOfRowCells = 7;
         //for each cell in a Row
-        for(columns) {
-            for(numOfRowCells) {
+        for(int loop1 = 0; loop1 < columns; ++loop1) {
+            for(int loop2 = 0; loop2 < numOfRowCells; ++loop2) {
                 movRow();
             }
-            movCol();
+            if(loop1 % 2 == 0) {
+                movCol(true);
+            } else {
+                movCol(false);
+            }
         }
-        return 0;
     }
     
     public static void movRow() {
@@ -50,17 +52,17 @@ public class AssOneMain {
             movAround();
         } else {
             //move forward a cell
-            movObj.nextCell(movObj);
+            movObj.nextCell(mapObj);
         }
     }
     
-    public static void movCol() {
+    public static void movCol(boolean b) {
         //rotate 90 degrees to the right
-        movObj.turn(true, mapObj);
+        movObj.turn(b, mapObj);
         //move forward a cell
         movRow();
         //rotate 90 degrees to the right
-        movObj.turn(true, mapObj);
+        movObj.turn(b, mapObj);
         
     }
     

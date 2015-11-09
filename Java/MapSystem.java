@@ -16,22 +16,38 @@ public class MapSystem {
 	
 	int heading = 1;			//plus or minus 1 depending on which direction the robot is facing
 	int direction = 1;			//direction 1-4 of where the robot is facing
-	int turned;
 	
+    //variables added to compile successfully
+    boolean turned;
+    int point;
+    int dest;
+    
+    
 	UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
+    MapSystem() {
 	
-	us.continuous();
+        us.continuous();
 
-	int dest = us.getDistance();	//distance to destination is distance from sonar
-	while (dest > 180) {			//get correct distance (to account for 255 error)
-		dest = us.getDistance();			
-	}
+        int dest = us.getDistance();	//distance to destination is distance from sonar
+        while (dest > 180) {			//get correct distance (to account for 255 error)
+            dest = us.getDistance();			
+        }
+    }
+    
 
+    public static boolean scanAhead() {
+        return false;
+    }
+    public static void updatePosition() {
+        
+    }
+    
+    
 	/* How the map system recognises a 
 	 * right turn
 	 */
 	void rightTurn() {
-		if (direction = 4){		//if max direction
+		if (direction == 4){		//if max direction
 			direction = 1;		//reset
 		} else {
 			direction++;		//change direction
@@ -56,7 +72,7 @@ public class MapSystem {
 	 * right turn
 	 */
 	void leftTurn() {
-		if (direction = 1){
+		if (direction == 1){
 			direction = 4;
 		} else {
 			direction--;
@@ -83,24 +99,24 @@ public class MapSystem {
 	 */  
 	void updateBlock(int b) {
 		
-		if (i = 1) {								//if x axis
+		if (i == 1) {								//if x axis
 			map[position[0]][b] = 1;				//update map
-			if (heading = 1) {
+			if (heading == 1) {
 				for (int j = position[i]; j < b; j++) {		//add in empty spaces up to obstacle
 					map[position[1]][j] = -1;
 				}
-			} else if (heading = -1) {
+			} else if (heading == -1) {
 				for (int j = position[i]; j > b; j--) {
 					map[position[1]][j] = -1;
 				}
 			}
-		} else if (i = 0) {								//if y axis
+		} else if (i == 0) {								//if y axis
 			map[position[0]][point] = 1;
-			if (heading = 1) {
+			if (heading == 1) {
 				for (int j = position[i]; j < b; j++) {		//add in empty spaces up to obstacle
 					map[j][position[1]] = -1;
 				}
-			} else if (heading = -1) {
+			} else if (heading == -1) {
 				for (int j = position[i]; j > b; j--) {
 					map[j][position[1]] = -1;
 				}
@@ -122,7 +138,7 @@ public class MapSystem {
 			//do nothing
 		} else {
 		
-			if(heading = -1) {
+			if(heading == -1) {
 				x = 1 + x - position[i];
 			}
 		

@@ -1,6 +1,7 @@
 import java.io.*;
 import lejos.nxt.*;
 import lejos.nxt.comm.*;
+import lejos.robotics.navigation.*;
 
 public class BtStuff {
 
@@ -31,7 +32,7 @@ public class BtStuff {
 
   //method to print a Pose input to the RConsole
   public static void poseToRCon(Pose p) {
-    RConsole.println(Pose.toString(p) );
+    RConsole.println(p.toString() );
   }
 
 }
