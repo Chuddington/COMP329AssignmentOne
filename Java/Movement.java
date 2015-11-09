@@ -23,7 +23,7 @@ public class Movement {
 	public int  length = 10; //These need values, for as many cells as there are
 	public int  width  = 5 ; //These need values, for as many cells as there are
 	public bool right      ; //variable to define a left/right turn
-  public BluetoothStuff btVar = new BluetoothStuff();
+    public BtStuff btVar = new BtStuff();
 	
 	//template main method
 	public static void main(String[] args) {
@@ -64,7 +64,7 @@ public class Movement {
 		
 		//Use opp.getPose() to get coordinates of the current location
 		//Use RConsole to print to PC
-    btVar.poseToRCon(opp.getPose() ); //parameter may not work - check
+        btVar.poseToRCon(opp.getPose() ); //parameter may not work - check
 		
 		//Nothing in the cell, set value to 0
 		//keeping track of the Y coordinate
@@ -112,7 +112,7 @@ public class Movement {
 		System.out.println("Press right bumper to start");
 		
 		if(rightBump.isPressed() ) {
-      rotate(90);
+            rotate(90);
 		}
 		System.out.println("Increase degree with R.bumper.  L.Bumper to exit");
 		if(rightBump.isPressed() ) {
