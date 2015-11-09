@@ -80,7 +80,7 @@ public class Movement {
 			pilot.travel(dist);
 			
 			//Can use opp.getPose() again to get coordinates
-      btVar.poseToRCon(opp.getPose() ); //parameter may not work - check
+            btVar.poseToRCon(opp.getPose() ); //parameter may not work - check
 			//Check for obstacles in next cell here
 			//Update values as needed
 		

@@ -2,7 +2,7 @@ import java.io.*;
 import lejos.nxt.*;
 import lejos.nxt.comm.*;
 
-public class BluetoothStuff {
+public class BtStuff {
 
   //global variables
   static int btPin = 4319;

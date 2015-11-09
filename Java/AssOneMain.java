@@ -16,46 +16,28 @@ import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.nxt.Button;
 import lejos.nxt.Motor;
-import lejos.nxt.SensorPort;
-import lejos.nxt.UltrasonicSensor;
-import lejos.nxt.TouchSensor;
  
  
 public class AssOneMain {
  
     //global variables here - templates for now
-    static void    someVarHere   = 0   ;
-    static int     someIntVar    = 0   ;
-    static String  someStringVar = ""  ;
-    static boolean isEmpty       = true;
+    
 
     public static int main(String[] args) {
-    
-        //calibrationClass methods here
-        //can be commented out later for the final program
-        //purely theoretical at this stage
-        public Calibrate calObj = new Calibrate(someVarHere);
-        /*
-        calObj.chkForwardMovement();
-        calObj.chkTurningCircles();
-        calObj.chkSonar();
-        calObj.chkLightTrail();
-        */
         
-        //set up a way why follows the robotic cycle of thinking
-        //mapping, moving, etc.
+        //import classes here
+        public MapSystem mapObj = new MapSystem();
+        public BtStuff   btObj  = new BtStuff()  ;
+        public Movement  movObj = new Movement() ;
+
         
-        public Mapper mapObj = new Mapper(someVarHere);
-        public Mover  movObj = new Mover (someVarHere);
-        
-        /* Examples of stuff
-        isEmpty = mapObj.SonarObstacle();
-        mapObj.addToWorld(cellInFrontX, cellInFrontY, isEmpty)
-        movObj.Cell(someStringVar = "ForwardCell");
-        */
-        //EndOfProgram
         return 0;
     }
     
+    public static void moveRow() {
+
+    }
+    
+    }
+    
     //EndOfFile
- }
