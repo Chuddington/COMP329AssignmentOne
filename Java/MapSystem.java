@@ -6,18 +6,27 @@ import lejos.nxt.TouchSensor;
 
 public class MapSystem {
 	
-	final int[] wallDist = {175,125};
-	final int[] limit = {6,4}; 
-	final int robotSize = 25;
+	final int[] wallDist = {175,125};		//wall to wall distance from robots point of view
+	final int[] limit = {6,4}; 				//highest coordinates
+	final int robotSize = 25;				//size of robot
 	
-	int[][] map = new int[5][7]; 
-	int[] position = {0,0};
-	int i = 0;
+	int[][] map = new int[5][7]; 			//map to be completed
+	int[] position = {0,0};					//robots position
+	int i = 0;								//counter to be used for position, limit, wallDist
 	
-	int one = 1;
+	int one = 1;		//
 	int direction = 1;
 	int turned;
 	int heading = 1;
+	
+	UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
+	
+	us.continuous();
+
+	int dest = us.getDistance();
+	while (dest > 180) {
+		dest = us.getDistance();			
+	}
 
 	/* How the map system recognises a 
 	 * right turn
@@ -103,10 +112,5 @@ public class MapSystem {
 				}
 			}
 		}
-	}
-	
-	public static void main (String[] args) {
-		
-	}
-	
+	}	
 }
