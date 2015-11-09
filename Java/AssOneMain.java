@@ -30,14 +30,23 @@ public class AssOneMain {
         public BtStuff   btObj  = new BtStuff()  ;
         public Movement  movObj = new Movement() ;
 
+        //for each Column
+            //moveRow() method
+            //movCol
         
         return 0;
     }
     
-    public static void moveRow() {
-
+    public static void movRow() {
+        //sonar scan in front of the robot
+        
+        //if empty move forward; if not, call movAround() method
+    }
+    
+    public static void movAround() {
+        
+        
     }
     
     }
-    
-    //EndOfFile
+//EndOfFile
