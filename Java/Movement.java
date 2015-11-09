@@ -23,7 +23,7 @@ public class Movement {
 	public int  length = 10; //These need values, for as many cells as there are
 	public int  width  = 5 ; //These need values, for as many cells as there are
 	public bool right      ; //variable to define a left/right turn
-    public BluetoothStuff btVar = new BluetoothStuff();
+    public BtStuff btVar = new BtStuff();
 	
 	//template main method
 	public static void main(String[] args) {
