@@ -14,17 +14,16 @@ public class MapSystem {
 	int[] position = {0,0};					//robots position
 	int i = 0;								//counter to be used for position, limit, wallDist
 	
-	int one = 1;		//
-	int direction = 1;
+	int heading = 1;			//plus or minus 1 depending on which direction the robot is facing
+	int direction = 1;			//direction 1-4 of where the robot is facing
 	int turned;
-	int heading = 1;
 	
 	UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
 	
 	us.continuous();
 
-	int dest = us.getDistance();
-	while (dest > 180) {
+	int dest = us.getDistance();	//distance to destination is distance from sonar
+	while (dest > 180) {			//get correct distance (to account for 255 error)
 		dest = us.getDistance();			
 	}
 
@@ -39,9 +38,9 @@ public class MapSystem {
 		}
 		
 		if (direction < 3) {	//if facing forward
-			move = 1;			
+			heading = 1;			
 		} else  {
-			move = -1;
+			heading = -1;
 		}
 		
 		turned = !turned;
@@ -64,9 +63,9 @@ public class MapSystem {
 		}
 		
 		if (direction < 3) {
-			move = 1;
+			heading = 1;
 		} else  {
-			move = -1;
+			heading = -1;
 		}
 		
 		if(turned) {
@@ -76,41 +75,59 @@ public class MapSystem {
 		}
 	}
 	
-	/* Adds a 1 if detects an obstacle
-	 * ahead and a -1 if empty.
+	/* Updates the specific part of the
+	 * map the robot thinks there is an
+	 * obstacle. 
+	 * Adds 1 where there is an obstacle
+	 * and -1 where there isn't.
+	 */  
+	void updateBlock(int b) {
+		
+		if (i = 1) {								//if x axis
+			map[position[0]][b] = 1;				//update map
+			if (heading = 1) {
+				for (int j = position[i]; j < b; j++) {		//add in empty spaces up to obstacle
+					map[position[1]][j] = -1;
+				}
+			} else if (heading = -1) {
+				for (int j = position[i]; j > b; j--) {
+					map[position[1]][j] = -1;
+				}
+			}
+		} else if (i = 0) {								//if y axis
+			map[position[0]][point] = 1;
+			if (heading = 1) {
+				for (int j = position[i]; j < b; j++) {		//add in empty spaces up to obstacle
+					map[j][position[1]] = -1;
+				}
+			} else if (heading = -1) {
+				for (int j = position[i]; j > b; j--) {
+					map[j][position[1]] = -1;
+				}
+			}
+		}
+		
+	}
+	
+	/* Calculates the distance in coordinates
+	 * to obstacle, then the actual coordinate
+	 * of the obstacle then puts it into the
+	 * map using updateBlock().
 	 */
 	void updateMap() {
 		
 		double d = dest / robotSize;	//get number of blocks till object
 		int x = (int) Math.round(d);	//get interger of blocks till object
 		if(x > limit[i]) {				//incase of error
-			x = limit[i];
-		}
+			//do nothing
+		} else {
 		
-		int point = position[i] + ((x+1) * move);		//position of blockade
+			if(heading = -1) {
+				x = 1 + x - position[i];
+			}
 		
-		if (i = 1) {									//if x axis
-			map[point][position[1]] = 1;				//update map
-			if (heading = 1) {
-				for (j = position[i]; j < point; j++) {
-					map[j][position[1]] = -1;
-				}
-			} else if (heading = -1) {
-				for (j = position[i]; j > point; j--) {
-					map[j][position[1]] = -1;
-				}
-			}
-		} else if (i = 0) {								//if y axis
-			map[position[0]][point] = 1;
-			if (heading = 1) {
-				for (j = position[i]; j < point; j++) {
-					map[j][position[1]] = -1;
-				}
-			} else if (heading = -1) {
-				for (j = position[i]; j > point; j--) {
-					map[j][position[1]] = -1;
-				}
-			}
+			int obstaclePosition = position[i] + ((x+1) * heading);		//position of blockade
+			updateBlock(obstaclePosition);
 		}
 	}	
 }
