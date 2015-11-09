@@ -31,8 +31,8 @@ public class AssOneMain {
         public Movement  movObj = new Movement() ;
 
         //for each Column
-            //moveRow() method
-            //movCol
+            //movRow() method
+            //movCol() method
         
         return 0;
     }
@@ -40,11 +40,29 @@ public class AssOneMain {
     public static void movRow() {
         //sonar scan in front of the robot
         
-        //if empty move forward; if not, call movAround() method
+        //if object detected:
+        //    call movAround() method
+        //else
+        //    move forward a cell
+    }
+    
+    public static void movCol() {
+        //rotate 90 degrees
+        //move forward a cell
+        //rotate 90 degrees
+        //scan / move 2 cells forward
+        //scan at the side to see if object is passed
+        //move back to correct column if empty
+        //    keep moving forward if object is still there
+        
     }
     
     public static void movAround() {
-        
+        //check for empty adjacent space
+        //rotate to face it
+        //move forward a cell
+        //rotate to face the correct way again
+        //move forward 
         
     }
     
