@@ -21,7 +21,7 @@ import lejos.nxt.Motor;
 public class AssOneMain {
  
     //global variables here - templates for now
-    
+    static int columns, numOfRowCells = 0;    
 
     public static int main(String[] args) {
         
@@ -30,39 +30,51 @@ public class AssOneMain {
         public BtStuff   btObj  = new BtStuff()  ;
         public Movement  movObj = new Movement() ;
 
-        //for each Column
-            //movRow() method
-            //movCol() method
         
+        //for each cell in a Row
+        for(columns) {
+            for(numOfRowCells) {
+                movRow();
+            }
+            movCol();
+        }
         return 0;
     }
     
     public static void movRow() {
         //sonar scan in front of the robot
-        
-        //if object detected:
-        //    call movAround() method
-        //else
-        //    move forward a cell
+        boolean objAhead = mapObj.scanAhead();
+        //if obstacle detected:
+        if(objAhead) {
+            //call movAround() method to navigate around the obstacle
+            movAround();
+        } else {
+            //move forward a cell
+            movObj.nextCell(movObj);
+        }
     }
     
     public static void movCol() {
-        //rotate 90 degrees
+        //rotate 90 degrees to the right
+        movObj.turn(true, mapObj);
         //move forward a cell
-        //rotate 90 degrees
-        //scan / move 2 cells forward
-        //scan at the side to see if object is passed
-        //move back to correct column if empty
-        //    keep moving forward if object is still there
+        movRow();
+        //rotate 90 degrees to the right
+        movObj.turn(true, mapObj);
         
     }
     
     public static void movAround() {
         //check for empty adjacent space
-        //rotate to face it
-        //move forward a cell
-        //rotate to face the correct way again
-        //move forward 
+        //Move to said empty space
+        //move forward 2 cells, scanning as we go
+        //if an obstacle is still on the same axis as the first
+        //    class it as a different obstacle
+        //    move forward a cell
+        //    scan again - recursive
+        //move back to the correct column
+        
+        //if at a 'limit cell', turn left instead of right
         
     }
     

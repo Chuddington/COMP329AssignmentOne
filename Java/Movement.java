@@ -23,6 +23,7 @@ public class Movement {
 	public int  length = 10; //These need values, for as many cells as there are
 	public int  width  = 5 ; //These need values, for as many cells as there are
 	public bool right      ; //variable to define a left/right turn
+    
     public BtStuff btVar = new BtStuff();
 	
 	//template main method
@@ -88,20 +89,22 @@ public class Movement {
 	}
 
   //As to not confuse with the pilot.rotate method
-	public void turn(bool right){	
+	public void turn(bool right, MapSystem ms){	
 	
 		if(right == true) {
 			pilot.rotate(degree) ; //Turns right
+            ms.rightTurn()       ; //tells mapping system a right turn has happened
 		}
 		else {
 			pilot.rotate(-degree); //Turn left		
+            ms.leftTurn()        ; //tells mapping system a left turn has happened
 		}	
 	}
 
-	public void nextCell(){
+	public void nextCell(MapSystem ms){
 	
-		pilot.travel(dist); //Moves one cell over; increments array width value
-			
+		pilot.travel(dist);  //Moves one cell over; increments array width value
+        ms.updatePosition(); //updates the robot's current position in the mapping system
 	}
 
 	public void calibrate(){
