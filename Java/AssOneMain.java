@@ -22,7 +22,7 @@ public class AssOneMain {
  
     //global variables here - templates for now
     static int columns, numOfRowCells = 0;   
-    static MapSystem mapObj = new MapSystem();
+    static MapSystem mapObj                  ;
     static BtStuff   btObj  = new BtStuff()  ;
     static Movement  movObj = new Movement() ; 
 
@@ -35,6 +35,8 @@ public class AssOneMain {
 
         columns = 5;
         numOfRowCells = 7;
+        mapObj = new MapSystem(columns, numOfRowCells);
+            
         //for each cell in a Row
         for(int loop1 = 0; loop1 < columns; ++loop1) {
             for(int loop2 = 0; loop2 < numOfRowCells; ++loop2) {
@@ -48,26 +50,25 @@ public class AssOneMain {
         }
     }
     
-public static void movRow() {
-    //sonar scan around the robot
-    objAhead = mapObj.scanAhead();
-    objLeft  = mapObj.scanLeft() ;
-    objRight = mapObj.scanRight();
-    
-    //if obstacle detected:
-    if(objAhead) {
-        //if there's an obstacle to the left & right.  i.e. a dead end
-        if(objLeft && objRight) {
-            turnAround(objLeft, mapObj);
+    public static void movRow() {
+        //sonar scan in front of the robot
+        objAhead = mapObj.scanAhead();
+        objLeft  = mapObj.scanLeft() ;
+        objRight = mapObj.scanRight();
+        //if obstacle detected:
+        if(objAhead) {
+            //if there's an obstacle to the left & right.  i.e. a dead end
+            if(objLeft && objRight) {
+                turnAround(objLeft, mapObj);
+            } else {
+                //call movAround() method to navigate around the obstacle
+                movAround(objLeft, mapObj, movObj);
+            }
         } else {
-            //call movAround() method to navigate around the obstacle
-            movAround(objLeft, mapObj);
+            //move forward a cell
+            movObj.nextCell(mapObj);
         }
-    } else {
-        //move forward a cell
-        movObj.nextCell(mapObj);
     }
-}
     
     public static void movCol(boolean b) {
         //rotate 90 degrees to the right
@@ -79,7 +80,25 @@ public static void movRow() {
         
     }
     
-    public static void movAround() {
+    //Method to move around a single obstacle - runs when obstacle is detected ahead but not in a dead end
+    public static void movAround(boolean r, MapSystem ms, Movement mv) {
+        //turn to the right if true (if an obstacle is on the left, for example)
+        mv.turn(r, ms);
+        //scan and move forward if necessary
+        movRow();
+        //invert the boolean to turn the other way
+        mv.turn(!r, ms);
+        //move forward twice to pass the obstacle
+        movRow();
+        movRow();
+        //turn and move to the correct column the robot should be in
+        mv.turn(!r, ms);
+        movRow();
+        //face the correct way to continue the patrol
+        mv.turn(r, ms);   
+    }
+    
+    public static void turnAround() {
         //check for empty adjacent space
         //Move to said empty space
         //move forward 2 cells, scanning as we go

@@ -10,7 +10,7 @@ public class MapSystem {
 	final int[] limit = {6,4}; 				//highest coordinates
 	final int robotSize = 25;				//size of robot
 	
-	int[][] map = new int[5][7]; 			//map to be completed
+	int[][] map;                 			//map to be completed
 	int[] position = {0,0};					//robots position
 	int i = 0;								//counter to be used for position, limit, wallDist
 	
@@ -24,8 +24,10 @@ public class MapSystem {
     
     
 	UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
-    MapSystem() {
-	
+    
+    
+    MapSystem(int c, int r) {
+        map = new int[c][r]; 			//map to be completed
         us.continuous();
 
         int dest = us.getDistance();	//distance to destination is distance from sonar
