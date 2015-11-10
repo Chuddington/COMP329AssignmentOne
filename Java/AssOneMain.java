@@ -53,8 +53,8 @@ public class AssOneMain {
     
     public static void movRow() {
         //work out probability
-        int nextCell = mapObj.basicProb();
-        btObj.stringToRCon("Object Probability in next Cell: " nextCell.toString() );
+        float nextCell = mapObj.basicProb();
+        btObj.stringToRCon("Object Probability in next Cell: " + nextCell);
         //sonar scan in front of the robot
         objLeft  = mapObj.scanLeft() ;
         objAhead = mapObj.scanAhead();
