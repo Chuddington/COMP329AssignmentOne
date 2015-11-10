@@ -23,6 +23,7 @@ public static void turnAround(boolean right, MapSystem ms) {
 }
 
 public static void moveAround(boolean r, MapSystem ms, Movement mv) {
+
     mv.turn(r, ms);
     movRow();
     mv.turn(!r, ms);
