@@ -96,6 +96,13 @@ public class Movement {
 		}	
 	}
     
+    public static void turn(MapSystem ms) {
+        pilot.rotate(degree) ; //Turns right
+        ms.rightTurn()       ; //tells mapping system a right turn has happened
+        pilot.rotate(degree) ; //Turns right
+        ms.rightTurn()       ; //tells mapping system a right turn has happened
+    }
+    
     public static void turn(boolean r) {
         if(right == true) {
 			pilot.rotate(degree) ; //Turns right

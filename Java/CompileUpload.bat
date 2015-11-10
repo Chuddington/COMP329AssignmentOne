@@ -1,3 +1,3 @@
-run nxjc QuestionFour.java
-run nxjlink -o QuestionFour.nxj QuestionFour
-run nxjupload QuestionFour.nxj
+run nxjc AssOneMain.java
+run nxjlink -o A1M.nxj AssOneMain
+run nxjupload A1M.nxj
