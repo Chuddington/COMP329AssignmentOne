@@ -29,61 +29,9 @@ public class Movement {
     public static BtStuff btVar = new BtStuff();
     public static DifferentialPilot pilot = new DifferentialPilot(3.22, 19, Motor.B, Motor.C);
     public static OdometryPoseProvider opp = new OdometryPoseProvider(pilot);
-	//template main method
 
-	public static void arenaTraversal() {
-	
-		//Assuming we start at the bottom left hand corner, pointing upwards
-		
-		for(int i = 0; i < 2; i++) {
-		
-		moveUp()     ; //For loop will move the robot up to the end
-		right = true ; //Turn to the next cell over and move back down
-		turn(right); //Where it moves to next cell over and resets the movement
-		nextCell()   ;
-		turn(right);
-		moveDown()   ;
-		right = false;
-		turn(right);
-		nextCell()   ;
-		turn(right);
-		
-		}
-		moveUp();
-	}
-	
-	public static void moveUp() {
-			
-		for(int i = 0; i <= length; i++) {
-		
-		pilot.travel(dist); //Moves to next cell in the positive Y direction
-		
-		//Use opp.getPose() to get coordinates of the current location
-		//Use RConsole to print to PC
-        btVar.poseToRCon(opp.getPose() ); //parameter may not work - check
-		
-		//Nothing in the cell, set value to 0
-		//keeping track of the Y coordinate
-		
-		//Method to check for obstacles in the next cell called here
-		}
-	
-	}
-	public static void moveDown(){
-		
-		for(int i = length; i >= 0; i--){
-		
-			pilot.travel(dist);
-			
-			//Can use opp.getPose() again to get coordinates
-            btVar.poseToRCon(opp.getPose() ); //parameter may not work - check
-			//Check for obstacles in next cell here
-			//Update values as needed
-		
-		}
-	}
-
-  //As to not confuse with the pilot.rotate method
+    
+    //As to not confuse with the pilot.rotate method
 	public static void turn(boolean right, MapSystem ms){	
 	
 		if(right == true) {
@@ -116,6 +64,7 @@ public class Movement {
 	public static void nextCell(MapSystem ms){
 	
 		pilot.travel(dist);  //Moves one cell over; increments array width value
+        btVar.poseToRCon(opp.getPose() ); //parameter may not work - check
         ms.updatePosition(); //updates the robot's current position in the mapping system
 	}
     
