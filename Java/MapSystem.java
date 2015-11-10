@@ -34,8 +34,8 @@ public class MapSystem {
         us.continuous();
     }
     
-    public static int basicProb() {
-        int x = ( (unknownObjs / totalCells) * 100);
+    public static float basicProb() {
+        float x = ( (unknownObjs / totalCells) * 100);
         if(!checkCell()) {
             --totalCells;
 		}
@@ -175,14 +175,16 @@ public class MapSystem {
 	 * of the obstacle then puts it into the
 	 * map using updateBlock().
 	 */
-	void updateMap(int dest) {
+	void updateMap() {
         
         dest = us.getDistance();	//distance to destination is distance from sonar
         while (dest == 255) {			//get correct distance (to account for 255 error)
             dest = us.getDistance();			
         }
 	
-        if (dest < robotSize) {
+        if((position[i] + heading) > limit[i] || (position[i] + heading) < 0) {
+             //do nothing
+        } else if (dest < robotSize) {
         
             if (i == 1) {											//if x axis
                 map[position[0]][position[1] + heading] = 1;		//update map
