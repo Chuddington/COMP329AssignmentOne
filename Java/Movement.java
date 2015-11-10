@@ -72,7 +72,7 @@ public class Movement {
 		pilot.travel(dist);  //Moves one cell over; increments array width value
         btVar.poseToRCon(opp.getPose() ); //parameter may not work - check
         ms.updatePosition(); //updates the robot's current position in the mapping system
-        ms.printMap(numOfRows, columns);
+        ms.printMap(columns, numOfRows);
 	}
     
     public static void nextCell(){

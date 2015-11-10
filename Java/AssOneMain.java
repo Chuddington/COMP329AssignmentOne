@@ -36,13 +36,13 @@ public class AssOneMain {
         columns = 5;
         numOfRowCells = 7;
         
-        mapObj = new MapSystem(numOfRowCells, columns);
-        movObj = new Movement(numOfRowCells, columns); 
+        mapObj = new MapSystem(columns, numOfRowCells);
+        movObj = new Movement(columns, numOfRowCells); 
         btObj.startBtConn();
             
         //for each cell in a Row
-        for(int loop1 = 0; loop1 < columns; ++loop1) {
-            for(int loop2 = 0; loop2 < numOfRowCells; ++loop2) {
+        for(int loop1 = 0; loop1 < columns; loop1++) {
+            for(int loop2 = 0; loop2 < numOfRowCells; loop2++) {
                 movRow();
             }
             if(loop1 % 2 == 0) {
@@ -55,7 +55,7 @@ public class AssOneMain {
     
     public static void movRow() {
         //work out probability
-        float nextCell = mapObj.basicProb();
+        double nextCell = mapObj.basicProb();
         btObj.stringToRCon("Object Probability in next Cell: " + nextCell);
         //sonar scan in front of the robot
         objLeft  = mapObj.scanLeft() ;

@@ -6,21 +6,22 @@ import lejos.nxt.TouchSensor;
 
 public class MapSystem {
 	
-	static int[] limit; 				//highest coordinates
-	final static int robotSize = 25;				//size of robot
+	final static int robotSize = 25;		//size of robot
 	
+   
 	static int[][] map;                 	//map to be completed
+    static int[] limit; 		//highest coordinates
 	static int[] position = {0,0};			//robots position
 	static int i = 1;						//counter to be used for position, limit
 
-	static int heading = 1;			    //plus or minus 1 depending on which direction the robot is facing
-	static int direction = 1;			//direction 1-4 of where the robot is facing
+	static int heading = 1;			        //plus or minus 1 depending on which direction the robot is facing
+	static int direction = 1;			    //direction 1-4 of where the robot is facing
 	
     //variables added to compile successfully
-    static int dest;                    //distance to object ahead
-    static int totalCells;              //number of cells
-    static int unknownObjs = 4;         //number of obstacles not found
-    static int lastTurn = 0;            //the direction the head was last turned
+    static int dest;                        //distance to object ahead
+    static int totalCells;                  //number of cells
+    static int unknownObjs = 4;             //number of obstacles not found
+    static int lastTurn = 0;                //the direction the head was last turned
     
     
 	static UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
@@ -28,7 +29,9 @@ public class MapSystem {
     //Constructor
     MapSystem(int c, int r) {
         map = new int[c][r]; 			//map to be completed
-        limit = {c, r};
+        limit = new int[2];
+        limit[0] = c;
+        limit[1] = r;
         totalCells = (c * r);
         us.continuous();
     }
@@ -46,16 +49,10 @@ public class MapSystem {
      */
     public static boolean scanAhead() {
         Motor.A.rotateTo(0);            //rotate to front
-        if(lastTurn == -1){             //if looking left
-            rightTurn();                //turn right
-        } else if (lastTurn == 1) {     //if looking right
-            leftTurn();                 //turn left
-        }
-        
+                
         dest = us.getDistance();        //scan
         updateMap();
         
-        lastTurn = 0;                   //robot is looking ahead
         if(dest < 30) {
             return true;
         } else {
@@ -76,8 +73,7 @@ public class MapSystem {
         
         Motor.A.rotateTo(0);            //rotate to front
         rightTurn();
-        
-        lastTurn = -1;                  //robot is looking left
+       
         if(dest < 30) {
             return true;
         } else {
@@ -99,7 +95,6 @@ public class MapSystem {
         Motor.A.rotateTo(0);
         leftTurn();
         
-        lastTurn = 1;                   //robot is looking right
         if(dest < 30) {
             return true;
         } else {
@@ -111,11 +106,7 @@ public class MapSystem {
      * based on it's current axis and heading.
      */
     public static void updatePosition() {
-        if(heading == -1) {             //if looking down axis
-			position[i]--;              //position coord decrease
-		} else {                        //if looking up axis
-			position[i]++;              //position coord increase
-		} 
+        position[i] = position[i] + heading;
     }
     
     
