@@ -24,7 +24,7 @@ public class AssOneMain {
     static int columns, numOfRowCells = 0;   
     static MapSystem mapObj                  ;
     static BtStuff   btObj  = new BtStuff()  ;
-    static Movement  movObj = new Movement() ; 
+    static Movement  movObj;
 
     static boolean objAhead = false;
     static boolean objLeft  = false;
@@ -35,7 +35,8 @@ public class AssOneMain {
 
         columns = 5;
         numOfRowCells = 7;
-        mapObj = new MapSystem(columns, numOfRowCells);
+        mapObj = new MapSystem(numOfRowCells, columns);
+        movObj = new Movement(numOfRowCells, columns); 
         btObj.startBtConn();
             
         //for each cell in a Row
@@ -60,7 +61,7 @@ public class AssOneMain {
         objAhead = mapObj.scanAhead();
         objRight = mapObj.scanRight();
         
-        mapObj.printMap(columns, numOfRowCells);
+       // mapObj.printMap(columns, numOfRowCells);
         
         //if obstacle detected:
         if(objAhead) {

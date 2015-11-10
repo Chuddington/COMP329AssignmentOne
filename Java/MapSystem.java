@@ -6,116 +6,130 @@ import lejos.nxt.TouchSensor;
 
 public class MapSystem {
 	
-	final int[] wallDist = {175,125};		//wall to wall distance from robots point of view
-	final int[] limit = {6,4}; 				//highest coordinates
-	final int robotSize = 25;				//size of robot
+	final static int[] limit = {6,4}; 				//highest coordinates
+	final static int robotSize = 25;				//size of robot
 	
 	static int[][] map;                 	//map to be completed
 	static int[] position = {0,0};			//robots position
-	static int i = 0;						//counter to be used for position, limit, wallDist
+	static int i = 0;						//counter to be used for position, limit
 
 	static int heading = 1;			    //plus or minus 1 depending on which direction the robot is facing
 	static int direction = 1;			//direction 1-4 of where the robot is facing
 	
     //variables added to compile successfully
     static boolean turned = false;
-    static int dest;
-    static int totalCells;
-    static int unknownObjs = 4;
-    static int lastTurn = 0;
+    static int dest;                    //distance to object ahead
+    static int totalCells;              //number of cells
+    static int unknownObjs = 4;         //number of obstacles not found
+    static int lastTurn = 0;            //the direction the head was last turned
     
     
 	static UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
     
-    
+    //Constructor
     MapSystem(int c, int r) {
         map = new int[c][r]; 			//map to be completed
         totalCells = (c * r);
         us.continuous();
     }
     
+    /* Works out the probability of the cell
+     * ahead being occupied.
+     */
     public static float basicProb() {
         float x = ( (unknownObjs / totalCells) * 100);
-        if(!checkCell()) {
-            --totalCells;
-		}
         return x;
     }
 
+    /* Scans the cell to the ahead of 
+     * the robot by turning its head
+     */
     public static boolean scanAhead() {
-        if(lastTurn == -1){
-            rightTurn();
-        } else if (lastTurn == 1) {
-            leftTurn();
+        Motor.A.rotateTo(0);            //rotate to front
+        if(lastTurn == -1){             //if looking left
+            rightTurn();                //turn right
+        } else if (lastTurn == 1) {     //if looking right
+            leftTurn();                 //turn left
         }
+        
+        dest = us.getDistance();        //scan
+        updateMap();
+        
+        lastTurn = 0;                   //robot is looking ahead
+        if(dest < 30) {
+            return true;
+        } else {
+            return false;
+        }
+        
+    }
+    
+    /* Scans the cell to the left of 
+     * the robot by turning its head
+     */
+    public static boolean scanLeft() {
+        Motor.A.rotateTo(-650);         //rotate to left
+        leftTurn();
+        
+        dest = us.getDistance();        //scan
+        updateMap();         
+        
+        Motor.A.rotateTo(0);            //rotate to front
+        rightTurn();
+        
+        lastTurn = -1;                  //robot is looking left
+        if(dest < 30) {
+            return true;
+        } else {
+            return false;
+        }
+        
+    }
+    
+    /* Scans the cell to the right of 
+     * the robot by turning its head
+     */
+    public static boolean scanRight() {
+        Motor.A.rotateTo(650);          //rotate to right
+        rightTurn();
+        
+        dest = us.getDistance();        //scan 
+        updateMap();
         
         Motor.A.rotateTo(0);
-        dest = us.getDistance();
+        leftTurn();
+        
+        lastTurn = 1;                   //robot is looking right
         if(dest < 30) {
             return true;
         } else {
             return false;
-        }
-        updateMap();
-        lastTurn = 0;
+        }                  
     }
-    public static boolean scanLeft() {
-        if (lastTurn == 1) {
-            leftTurn();
-            leftTurn();
-        } else if (lastTurn == 0) {
-            leftTurn();
-        }
-        
-        Motor.A.rotateTo(-650);
-        dest = us.getDistance();
-        if(dest < 30) {
-            return true;
-        } else {
-            return false;
-        }
-        updateMap();
-        lastTurn = -1;
-    }
-    public static boolean scanRight() {
-        if (lastTurn == -1) {
-            rightTurn();
-            rightTurn();
-        } else if (lastTurn == 0) {
-            rightTurn();
-        }
-        
-        Motor.A.rotateTo(650);
-        dest = us.getDistance();
-        if(dest < 30) {
-            return true;
-        } else {
-            return false;
-        }
-        updateMap();
-        lastTurn = 1;
-    }
-        
+    
+    /* Updates the current position of the robot 
+     * based on it's current axis and heading.
+     */
     public static void updatePosition() {
-        if(heading == -1) {
-			position[i]--;
-		} else {
-			position[i]++;
+        if(heading == -1) {             //if looking down axis
+			position[i]--;              //position coord decrease
+		} else {                        //if looking up axis
+			position[i]++;              //position coord increase
 		} 
     }
     
     
 	/* How the map system recognises a 
-	 * right turn
+	 * right turn.
 	 */
-	void rightTurn() {
+	public static void rightTurn() {
 		if (direction == 4){		//if max direction
-			direction = 1;		//reset
+			direction = 1;		    //reset
 		} else {
-			direction++;		//change direction
+			direction++;		    //change direction
 		}
 		
-		if (direction < 3) {	//if facing forward
+		if (direction < 3) {	    //if facing forward
 			heading = 1;			
 		} else  {
 			heading = -1;
@@ -124,16 +138,16 @@ public class MapSystem {
 		turned = !turned;
 		
 		if(turned) {
-			i = 1;		//y is 0 and x is 1
+			i = 1;		            //y axis is 0 and x axis is 1
 		} else {
 			i = 0;
 		}
 	}
 	
 	/* How the map system recognises a 
-	 * right turn
+	 * right turn.
 	 */
-	void leftTurn() {
+	public static void leftTurn() {
 		if (direction == 1){
 			direction = 4;
 		} else {
@@ -153,58 +167,44 @@ public class MapSystem {
 		}
 	}
 	
-	//checks cell ahead to see if known
-	boolean checkCell() {
-		if (i = 0) {
-			if (map[position[i] + heading][position[i]] == 0) {
-				return false;
-			} else {
-				return true;
-			}	
-		} else {
-			if (map[position[0]][position[i] + heading] == 0) {
-				return false;
-			} else {
-				return true;
-			}
-		}
-	}
-	
-	/* Calculates the distance in coordinates
-	 * to obstacle, then the actual coordinate
-	 * of the obstacle then puts it into the
-	 * map using updateBlock().
+	/* Decides whether there is an obstacle
+     * or an empty space ahead then adds it
+     * to the map.
 	 */
-	void updateMap() {
+	public static void updateMap() {
         
-        dest = us.getDistance();	//distance to destination is distance from sonar
+        dest = us.getDistance();	    //distance to destination is distance from sonar
         while (dest == 255) {			//get correct distance (to account for 255 error)
             dest = us.getDistance();			
         }
 	
-        if((position[i] + heading) > limit[i] || (position[i] + heading) < 0) {
+        if((position[i] + heading) > limit[i] || (position[i] + heading) < 0) {     //if cell ahead is a wall
              //do nothing
-        } else if (dest < robotSize) {
+        } else if (dest < robotSize) {                              //if cell ahead is occupied
         
             if (i == 1) {											//if x axis
-                map[position[0]][position[1] + heading] = 1;		//update map
-            } else if (i == 0) {										//if y axis
-                map[position[0] + heading][position[1]] = 1;
-            }	
+                map[position[0]][position[1] + heading] = 1;		    //mark obstacle on map
+            } else if (i == 0) {									//if y axis
+                map[position[0] + heading][position[1]] = 1;        
+            }
+            unknownObjs--;
+            totalCells--;
             
         } else {
             
             if (i == 1) {											//if x axis
-                map[position[0]][position[1] + heading] = -1;		//update map
-            } else if (i == 0) {										//if y axis
+                map[position[0]][position[1] + heading] = -1;		    //mark empty space on map
+            } else if (i == 0) {									//if y axis
                 map[position[0] + heading][position[1]] = -1;
             }
-            
+            totalCells--;
         }
     }
 
-	//for robot
-    void printMap(int c, int r) {
+	/* Prints current map to lcd 
+     * screen.
+     */
+    public static void printMap(int c, int r) {
         for(int i = 0; i < c; i++) {
 			for(int j = 0; j < r; j++){
 				System.out.print(map[j][i]);
@@ -213,15 +213,19 @@ public class MapSystem {
 		}   
     }
 	
-	//for bluetooth
-	String getMap(int c, int r) {
+	/* Puts map into a string for 
+     * bluetooth
+     */
+	public static String getMap(int c, int r) {
+        StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < c; i++) {
 			for(int j = 0; j < r; j++){
 				sb.append(map[j][i]);
 			}
-			sb.append("\n")
+			sb.append("\n");
 		}
 		String s = sb.toString();
 		return s;
+
 	}
 }

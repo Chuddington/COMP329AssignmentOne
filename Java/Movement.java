@@ -18,11 +18,13 @@ public class Movement {
   //25x20.  Will measure the size of the arena to make making the grid easier
 	
   //global variables
-	public static int     dist   = 25   ; //Size of robot, used to move one cell
-	public static int     degree = 107  ; //Can set the rotation value after calibration
-	public static int     length = 10   ; //These need values, for as many cells as there are
-	public static int     width  = 5    ; //These need values, for as many cells as there are
-	public static boolean right  = false; //variable to define a left/right turn
+	public static int     dist    = 25   ; //Size of robot, used to move one cell
+	public static int     degree  = 107  ; //Can set the rotation value after calibration
+	public static int     length  = 10   ; //These need values, for as many cells as there are
+	public static int     width   = 5    ; //These need values, for as many cells as there are
+	public static boolean right   = false; //variable to define a left/right turn
+    public static int     columns = 0    ;
+    public static int     numOfRows = 0;
     
 
 
@@ -30,6 +32,10 @@ public class Movement {
     public static DifferentialPilot pilot = new DifferentialPilot(3.22, 19, Motor.B, Motor.C);
     public static OdometryPoseProvider opp = new OdometryPoseProvider(pilot);
 
+    Movement(int c, int r) {
+        columns = c;
+        numOfRows = r;
+    } 
     
     //As to not confuse with the pilot.rotate method
 	public static void turn(boolean right, MapSystem ms){	
@@ -66,6 +72,7 @@ public class Movement {
 		pilot.travel(dist);  //Moves one cell over; increments array width value
         btVar.poseToRCon(opp.getPose() ); //parameter may not work - check
         ms.updatePosition(); //updates the robot's current position in the mapping system
+        ms.printMap(numOfRows, columns);
 	}
     
     public static void nextCell(){
