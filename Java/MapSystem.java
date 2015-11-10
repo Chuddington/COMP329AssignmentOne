@@ -36,8 +36,7 @@ public class MapSystem {
     
     public static int basicProb() {
         int x = ( (unknownObjs / totalCells) * 100);
-        updateMap();
-        if(checkCell() ) {
+        if(!checkCell()) {
             --totalCells;
 		}
         return x;
@@ -102,9 +101,7 @@ public class MapSystem {
 			position[i]--;
 		} else {
 			position[i]++;
-		}
-        updateMap();
-        
+		} 
     }
     
     
@@ -171,9 +168,6 @@ public class MapSystem {
 				return true;
 			}
 		}
-		
-		
-		
 	}
 	
 	/* Calculates the distance in coordinates

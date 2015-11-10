@@ -94,7 +94,7 @@ public class AssOneMain {
         movRow();
         //turn and move to the correct column the robot should be in
         mv.turn(!r, ms);
-        scanAhead = mapObj.scanAhead
+        scanAhead = mapObj.scanAhead;
         while(extend) {
             
         }
