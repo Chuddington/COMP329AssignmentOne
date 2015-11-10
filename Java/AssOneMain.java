@@ -36,6 +36,7 @@ public class AssOneMain {
         columns = 5;
         numOfRowCells = 7;
         mapObj = new MapSystem(columns, numOfRowCells);
+        btObj.startBtConn();
             
         //for each cell in a Row
         for(int loop1 = 0; loop1 < columns; ++loop1) {
@@ -51,10 +52,15 @@ public class AssOneMain {
     }
     
     public static void movRow() {
+        //work out probability
+        int nextCell = mapObj.basicProb();
+        btObj.stringToRCon("Object Probability in next Cell: " nextCell.toString() );
         //sonar scan in front of the robot
         objLeft  = mapObj.scanLeft() ;
         objAhead = mapObj.scanAhead();
         objRight = mapObj.scanRight();
+        
+        mapObj.printMap(columns, numOfRowCells);
         
         //if obstacle detected:
         if(objAhead) {
@@ -94,9 +100,11 @@ public class AssOneMain {
         movRow();
         //turn and move to the correct column the robot should be in
         mv.turn(!r, ms);
-        scanAhead = mapObj.scanAhead;
+        boolean extend = mapObj.scanAhead();
         while(extend) {
-            
+            mv.turn(r, ms);
+            movRow();
+            mv.turn(!r, ms);
         }
         movRow();
         //face the correct way to continue the patrol
