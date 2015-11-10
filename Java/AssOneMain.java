@@ -52,14 +52,15 @@ public class AssOneMain {
     
     public static void movRow() {
         //sonar scan in front of the robot
-        objAhead = mapObj.scanAhead();
         objLeft  = mapObj.scanLeft() ;
+        objAhead = mapObj.scanAhead();
         objRight = mapObj.scanRight();
+        
         //if obstacle detected:
         if(objAhead) {
             //if there's an obstacle to the left & right.  i.e. a dead end
             if(objLeft && objRight) {
-                turnAround(objLeft, mapObj);
+                turnAround(objLeft, mapObj, movObj);
             } else {
                 //call movAround() method to navigate around the obstacle
                 movAround(objLeft, mapObj, movObj);
@@ -98,7 +99,10 @@ public class AssOneMain {
         mv.turn(r, ms);   
     }
     
-    public static void turnAround() {
+    //method to run when the robot is in a dead end and has to back up and go around
+    public static void turnAround(boolean r, MapSystem ms, Movement mv) {
+        //turn around and move back a square
+        mv.turn(ms);
         //check for empty adjacent space
         //Move to said empty space
         //move forward 2 cells, scanning as we go

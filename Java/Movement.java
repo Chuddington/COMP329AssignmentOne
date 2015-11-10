@@ -19,7 +19,7 @@ public class Movement {
 	
   //global variables
 	public static int     dist   = 25   ; //Size of robot, used to move one cell
-	public static int     degree = 90   ; //Can set the rotation value after calibration
+	public static int     degree = 107  ; //Can set the rotation value after calibration
 	public static int     length = 10   ; //These need values, for as many cells as there are
 	public static int     width  = 5    ; //These need values, for as many cells as there are
 	public static boolean right  = false; //variable to define a left/right turn
