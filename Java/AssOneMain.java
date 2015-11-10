@@ -94,6 +94,10 @@ public class AssOneMain {
         movRow();
         //turn and move to the correct column the robot should be in
         mv.turn(!r, ms);
+        scanAhead = mapObj.scanAhead
+        while(extend) {
+            
+        }
         movRow();
         //face the correct way to continue the patrol
         mv.turn(r, ms);   
@@ -103,8 +107,21 @@ public class AssOneMain {
     public static void turnAround(boolean r, MapSystem ms, Movement mv) {
         //turn around and move back a square
         mv.turn(ms);
+        movRow();
         //check for empty adjacent space
+        objLeft  = mapObj.scanLeft() ;
+        objRight = mapObj.scanRight();
         //Move to said empty space
+        if(objLeft && !objRight) { //Obstacle on the Left
+            mv.turn(objLeft, ms);
+            movRow();
+        } else if(objRight && !objLeft) { //Obstacle on the Right
+            mv.turn(objRight, ms);
+            movRow();
+        } else { //in a corridor
+            movRow();
+        }
+        
         //move forward 2 cells, scanning as we go
         //if an obstacle is still on the same axis as the first
         //    class it as a different obstacle
