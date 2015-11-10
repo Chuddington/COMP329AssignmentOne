@@ -32,9 +32,10 @@ public class AssOneMain {
     
 
     public static void main(String[] args) {
-
+        //grid values for mapping
         columns = 5;
         numOfRowCells = 7;
+        
         mapObj = new MapSystem(numOfRowCells, columns);
         movObj = new Movement(numOfRowCells, columns); 
         btObj.startBtConn();

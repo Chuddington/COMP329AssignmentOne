@@ -6,28 +6,30 @@ import lejos.nxt.TouchSensor;
 
 public class MapSystem {
 	
-	final static int[] limit = {6,4}; 				//highest coordinates
-	final static int robotSize = 25;				//size of robot
+	static int[] limit; 				//highest coordinates
+	final static int robotSize = 25 ;				//size of robot
+    static int xLimit, yLimit ; 
 	
 	static int[][] map;                 	//map to be completed
+    static int xPos, yPos = 0;     //variables for X and Y position for the map array
 	static int[] position = {0,0};			//robots position
 	static int i = 0;						//counter to be used for position, limit
 
-	static int heading = 1;			    //plus or minus 1 depending on which direction the robot is facing
+	static boolean heading = false; //Boolean value - false = facing Y Axis
 	static int direction = 1;			//direction 1-4 of where the robot is facing
 	
     //variables added to compile successfully
-    static boolean turned = false;
     static int dest;                    //distance to object ahead
     static int totalCells;              //number of cells
     static int unknownObjs = 4;         //number of obstacles not found
-    static int lastTurn = 0;            //the direction the head was last turned
     
     
 	static UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
     
     //Constructor
     MapSystem(int c, int r) {
+        xLimit = c;
+        yLimit = r;        
         map = new int[c][r]; 			//map to be completed
         totalCells = (c * r);
         us.continuous();
@@ -46,16 +48,10 @@ public class MapSystem {
      */
     public static boolean scanAhead() {
         Motor.A.rotateTo(0);            //rotate to front
-        if(lastTurn == -1){             //if looking left
-            rightTurn();                //turn right
-        } else if (lastTurn == 1) {     //if looking right
-            leftTurn();                 //turn left
-        }
         
         dest = us.getDistance();        //scan
         updateMap();
         
-        lastTurn = 0;                   //robot is looking ahead
         if(dest < 30) {
             return true;
         } else {
@@ -77,7 +73,6 @@ public class MapSystem {
         Motor.A.rotateTo(0);            //rotate to front
         rightTurn();
         
-        lastTurn = -1;                  //robot is looking left
         if(dest < 30) {
             return true;
         } else {
@@ -99,7 +94,6 @@ public class MapSystem {
         Motor.A.rotateTo(0);
         leftTurn();
         
-        lastTurn = 1;                   //robot is looking right
         if(dest < 30) {
             return true;
         } else {
@@ -111,11 +105,21 @@ public class MapSystem {
      * based on it's current axis and heading.
      */
     public static void updatePosition() {
-        if(heading == -1) {             //if looking down axis
-			position[i]--;              //position coord decrease
-		} else {                        //if looking up axis
-			position[i]++;              //position coord increase
-		} 
+        switch (direction) {
+        case 1: //facing up
+            ++yPos;
+            break;
+        case 2:  //facing right
+            ++xPos;
+            break;
+        case 3:  //facing down
+            --yPos;
+            break;
+        case 4:  //facing left
+            --xPos;
+            break;
+        }
+ 
     }
     
     
@@ -129,19 +133,7 @@ public class MapSystem {
 			direction++;		    //change direction
 		}
 		
-		if (direction < 3) {	    //if facing forward
-			heading = 1;			
-		} else  {
-			heading = -1;
-		}
-		
-		turned = !turned;
-		
-		if(turned) {
-			i = 1;		            //y axis is 0 and x axis is 1
-		} else {
-			i = 0;
-		}
+		heading = axisCheck(direction);
 	}
 	
 	/* How the map system recognises a 
@@ -154,17 +146,7 @@ public class MapSystem {
 			direction--;
 		}
 		
-		if (direction < 3) {
-			heading = 1;
-		} else  {
-			heading = -1;
-		}
-		
-		if(turned) {
-			i = 1;		
-		} else {
-			i = 0;
-		}
+		heading = axisCheck(direction);
 	}
 	
 	/* Decides whether there is an obstacle
@@ -178,12 +160,17 @@ public class MapSystem {
             dest = us.getDistance();			
         }
 	
-        if((position[i] + heading) > limit[i] || (position[i] + heading) < 0) {     //if cell ahead is a wall
-             //do nothing
-        } else if (dest < robotSize) {                              //if cell ahead is occupied
+        // if robot is facing at a wall and is next to said wall
+        if( (xPos == (xLimit - 1) && (direction == 2) ) || 
+            (yPos == (yLimit - 1) && (direction == 1) ) ||
+            (xPos == 0 && (direction == 4) ) || 
+            (yPos == 0 && (direction == 3) ) ) {
+                //do nothing
+                
+        } else if (dest < robotSize) { //if cell ahead is occupied or too close to the wall
         
-            if (i == 1) {											//if x axis
-                map[position[0]][position[1] + heading] = 1;		    //mark obstacle on map
+            if (axisCheck(direction) == true) {											//if x axis
+                map[position[xPos]][position[yPos] + heading] = 1;		    //mark obstacle on map
             } else if (i == 0) {									//if y axis
                 map[position[0] + heading][position[1]] = 1;        
             }
@@ -228,4 +215,13 @@ public class MapSystem {
 		return s;
 
 	}
+    
+    //method to output a boolean value based on which axis the robot is facing
+    public static boolean axisCheck(int d) {
+        if( (d % 2) == 0) {
+			return true;  //even = X axis
+		} else {
+			return false; //odd = Y axis
+		}
+    }
 }
