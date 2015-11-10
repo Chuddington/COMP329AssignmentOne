@@ -24,7 +24,12 @@ public class AssOneMain {
     static int columns, numOfRowCells = 0;   
     static MapSystem mapObj = new MapSystem();
     static BtStuff   btObj  = new BtStuff()  ;
-    static Movement  movObj = new Movement() ;    
+    static Movement  movObj = new Movement() ; 
+
+    static boolean objAhead = false;
+    static boolean objLeft  = false;
+    static boolean objRight = false;
+    
 
     public static void main(String[] args) {
 
@@ -43,18 +48,26 @@ public class AssOneMain {
         }
     }
     
-    public static void movRow() {
-        //sonar scan in front of the robot
-        boolean objAhead = mapObj.scanAhead();
-        //if obstacle detected:
-        if(objAhead) {
-            //call movAround() method to navigate around the obstacle
-            movAround();
+public static void movRow() {
+    //sonar scan around the robot
+    objAhead = mapObj.scanAhead();
+    objLeft  = mapObj.scanLeft() ;
+    objRight = mapObj.scanRight();
+    
+    //if obstacle detected:
+    if(objAhead) {
+        //if there's an obstacle to the left & right.  i.e. a dead end
+        if(objLeft && objRight) {
+            turnAround(objLeft, mapObj);
         } else {
-            //move forward a cell
-            movObj.nextCell(mapObj);
+            //call movAround() method to navigate around the obstacle
+            movAround(objLeft, mapObj);
         }
+    } else {
+        //move forward a cell
+        movObj.nextCell(mapObj);
     }
+}
     
     public static void movCol(boolean b) {
         //rotate 90 degrees to the right

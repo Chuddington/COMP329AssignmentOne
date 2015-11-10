@@ -1,8 +1,8 @@
 public static void movRow() {
     //sonar scan in front of the robot
-    boolean objAhead = mapObj.scanAhead();
-    boolean objLeft  = mapObj.scanLeft() ;
-    boolean objRight = mapObj.scanRight();
+    objAhead = mapObj.scanAhead();
+    objLeft  = mapObj.scanLeft() ;
+    objRight = mapObj.scanRight();
     //if obstacle detected:
     if(objAhead) {
         //if there's an obstacle to the left & right.  i.e. a dead end
@@ -19,5 +19,17 @@ public static void movRow() {
 }
 
 public static void turnAround(boolean right, MapSystem ms) {
+    
+}
+
+public static void moveAround(boolean r, MapSystem ms, Movement mv) {
+    mv.turn(r, ms);
+    movRow();
+    mv.turn(!r, ms);
+    movRow();
+    movRow();
+    mv.turn(!r, ms);
+    movRow();
+    mv.turn(r, ms);
     
 }
