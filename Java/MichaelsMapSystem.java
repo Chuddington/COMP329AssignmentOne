@@ -5,7 +5,7 @@ import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.TouchSensor;
 import lejos.nxt.*;
 
-public class MapSystem {
+public class MichaelsMapSystem {
   
   final static int     robotSize      = 25   ; //Used for travelling distance
         static int     xPos, yPos     = 0    ; //Current Position of Robot
@@ -15,7 +15,7 @@ public class MapSystem {
         static int     direction      = 1    ; //1-4 range; 1 = Up, 4 = Right
         static int     unknownObjs    = 4    ; //number of obstacles not found
         static int[][] map                   ; //map to be completed
-        static int[][] occGrid               ; //probability grid
+        static double[][] occGrid               ; //probability grid
         static int[][] countGrid             ; //grid to count scans
         static int     dest                  ; //distance to object ahead
         static int     totalCells            ; //number of cells
@@ -23,7 +23,7 @@ public class MapSystem {
         static UltrasonicSensor us    = new  UltrasonicSensor(SensorPort.S4);
     
   //Constructor - c = columns; r = number of cells in each column
-  MapSystem(int c, int r) {
+  MichaelsMapSystem(int c, int r) {
     //Store parameters locally
     xLimit     = c                ;
     yLimit     = r                ;
@@ -31,7 +31,7 @@ public class MapSystem {
     
     //Variable Definitions
     map        = new int[xLimit][yLimit]; //Stores cell state
-    occGrid    = new int[xLimit][yLimit]; //Stores cell probability state
+    occGrid    = new double[xLimit][yLimit]; //Stores cell probability state
     countGrid  = new int[xLimit][yLimit]; //Stores cell scan count
 
     //normalise array values
@@ -71,8 +71,8 @@ public class MapSystem {
   //Scans the cell in front of the robot by turning its Ultrasonic sensor
   public static boolean scanAhead() {
     Motor.A.rotateTo(0)    ; //rotate Ultrasonic sensor to front
-    
-    updateMap(us.getDistance(), direction);
+    dest = us.getDistance();
+    updateMap(dest, direction);
     
     //if an obstacle is close
     if(dest < 30) {
@@ -86,8 +86,8 @@ public class MapSystem {
   public static boolean scanLeft() {
     Motor.A.rotateTo(-650); //rotate to left
     leftTurn() ;
-    
-    updateMap(us.getDistance(), direction);
+    dest = us.getDistance();
+    updateMap(dest, direction);
         
     Motor.A.rotateTo(0)   ; //rotate to front
     rightTurn();
@@ -104,8 +104,8 @@ public class MapSystem {
   public static boolean scanRight() {
     Motor.A.rotateTo(650); //rotate to right
     rightTurn();
-
-    updateMap(us.getDistance(), direction);
+    dest = us.getDistance();
+    updateMap(dest, direction);
         
     Motor.A.rotateTo(0)  ; //rotate to front
     leftTurn() ;
@@ -171,22 +171,22 @@ public class MapSystem {
         case 1: //when sensor faces up
           map[xPos + 1][yPos] = 1;
           incOccGrid(   (xPos + 1), yPos); //increase probability
-          incCountGrid( (xPos + 1), yPos); //increase count
           break;
         case 2: //when sensor faces right
           map[xPos][yPos + 1] = 1;
           incOccGrid(xPos,   (yPos + 1) ); //increase probability
-          incCountGrid(xPos, (yPos + 1) ); //increase count
           break;
         case 3: //when sensor faces down
-          map[xPos - 1][yPos] = 1;
-          incOccGrid(   (xPos - 1), yPos); //increase probability
-          incCountGrid( (xPos - 1), yPos); //increase count
+          if(xPos - 1 >= 0) {
+            map[xPos - 1][yPos] = 1;
+            incOccGrid(   (xPos - 1), yPos); //increase probability
+          }
           break;
         case 4: //when sensor faces left
-          map[xPos][yPos - 1] = 1;
-          incOccGrid(xPos,   (yPos - 1) ); //increase probability
-          incCountGrid(xPos, (yPos - 1) ); //increase count
+          if(yPos - 1 >= 0) {
+            map[xPos][yPos - 1] = 1;
+            incOccGrid(xPos,   (yPos - 1) ); //increase probability
+          }
           break;
       }
       --totalCells ; //lower total unknown cells; increases basic probability
@@ -198,22 +198,18 @@ public class MapSystem {
         case 1: //when sensor faces up
           map[xPos + 1][yPos] = 2;
           decOccGrid(   (xPos + 1), yPos); //decrease probability
-          incCountGrid( (xPos + 1), yPos); //increase count
           break;
         case 2: //when sensor faces right
           map[xPos][yPos + 1] = 2;
           decOccGrid(xPos,   (yPos + 1) ); //decrease probability
-          incCountGrid(xPos, (yPos + 1) ); //increase count
           break;
         case 3: //when sensor faces down
           map[xPos - 1][yPos] = 2;
           decOccGrid(   (xPos - 1), yPos); //decrease probability
-          incCountGrid( (xPos - 1), yPos); //increase count
           break;
         case 4: //when sensor faces left
           map[xPos][yPos - 1] = 2;
           decOccGrid(xPos,   (yPos - 1) ); //decrease probability
-          incCountGrid(xPos, (yPos - 1) ); //increase count
           break;
       }
       --totalCells ; //lower total unknown cells; increases basic probability
@@ -228,7 +224,20 @@ public class MapSystem {
     for(int loop1 = (row - 1); loop1 >= 0; --loop1) {
       //for each cell in the current row
       for(int loop2 = (col - 1); loop2 >= 0; --loop2) {
-        System.out.print(target[loop2][loop1] );
+        System.out.print("" + target[loop2][loop1] );
+      }
+      System.out.print('\n');
+    }
+  }
+
+  public static void printMap(double[][] target, int col, int row) {
+    LCD.clear();
+
+    //for each row (Y axis) going backwards for output layout purposes
+    for(int loop1 = (row - 1); loop1 >= 0; --loop1) {
+      //for each cell in the current row
+      for(int loop2 = (col - 1); loop2 >= 0; --loop2) {
+        System.out.print("" + target[loop2][loop1] );
       }
       System.out.print('\n');
     }
@@ -239,9 +248,9 @@ public class MapSystem {
     StringBuilder sb = new StringBuilder();
 
     //for each row (Y axis) going backwards for output layout purposes
-    for(int loop1 = (row - 1); loop1 >= 0; --loop1) {
+    for(int loop1 = (yLimit - 1); loop1 >= 0; --loop1) {
       //for each cell in the current row
-      for(int loop2 = (col - 1); loop2 >= 0; --loop2) {
+      for(int loop2 = (xLimit - 1); loop2 >= 0; --loop2) {
         sb.append(target[loop2][loop1] ); //concatenate element to String Builder
         sb.append(" ") ; //space added for layout purposes
       }

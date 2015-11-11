@@ -18,7 +18,7 @@ import lejos.nxt.Button;
 import lejos.nxt.Motor;
  
  
-public class AssOneMain {
+public class AoneMainMike {
  
   //global variables here - templates for now
   static int       columns       = 0            ; //grid X axis
@@ -29,8 +29,8 @@ public class AssOneMain {
   static boolean   objAhead      = false        ; //true if front cell is full
   static boolean   objLeft       = false        ; //true if left  cell is full
   static boolean   objRight      = false        ; //true if right cell is full
-  static Movement  movObj; //given value in main
-  static MapSystem mapObj; //given value in main
+  static MikeMovement  movObj; //given value in main
+  static MichaelsMapSystem mapObj; //given value in main
 
   public static void main(String[] args) {
     //grid values for mapping
@@ -38,8 +38,8 @@ public class AssOneMain {
     numOfRowCells = 7;
 
     //connect to other classes
-    mapObj = new MapSystem(columns, numOfRowCells);
-    movObj = new Movement( columns, numOfRowCells);
+    mapObj = new MichaelsMapSystem(columns, numOfRowCells);
+    movObj = new MikeMovement( columns, numOfRowCells);
     
     //connect to RConsole
     btObj.startBtConn();
@@ -49,6 +49,7 @@ public class AssOneMain {
       //for each cell within the column
       for(loop2 = 0; loop2 < numOfRowCells; loop2++) {
         movRow(); //scan and move method
+        btObj.stringToRCon(mapObj.getMap(mapObj.map, columns, numOfRowCells) );
       }
       if(loop1 % 2 == 0) { //if the robot moves along the Y axis positively
         movCol(true) ;     //turn right into the new column
@@ -79,7 +80,7 @@ public class AssOneMain {
         turnAround(objLeft, mapObj, movObj); //move backwards
       } else {
         //call movAround() method to navigate around the obstacle
-        movAround( objRight, mapObj, movObj);
+        movAround( objLeft, mapObj, movObj);
       }
     } else {
       movObj.nextCell(mapObj); //move forward a cell
@@ -95,7 +96,7 @@ public class AssOneMain {
   }
     
   //Method to move around an obstacle - runs when obstacle is in front
-  public static void movAround(boolean r, MapSystem ms, Movement mv) {
+  public static void movAround(boolean r, MichaelsMapSystem ms, MikeMovement mv) {
     mv.turn(r, ms) ; //true = right turn; false = left turn
     movRow()       ; //scan and move forward if necessary
     mv.turn(!r, ms); //invert the boolean to turn the other way
@@ -123,7 +124,7 @@ public class AssOneMain {
   }
     
   //method runs when robot is in a dead end and has to back up and go around
-  public static void turnAround(boolean r, MapSystem ms, Movement mv) {
+  public static void turnAround(boolean r, MichaelsMapSystem ms, MikeMovement mv) {
     mv.turn(ms); //180 degree turn
     movRow()   ; //move forward
 
@@ -135,7 +136,8 @@ public class AssOneMain {
     if(objLeft && !objRight) { //Obstacle on the Left
       mv.turn(objLeft,  ms);   //turn right
       movRow();
-    } else if(objRight && !objLeft) { //Obstacle on the Right
+      --loop2;
+    } else if( objRight && !objLeft) { //Obstacle on the Right
       mv.turn(!objRight, ms);  //turn left
       movRow();
     } else { //in a corridor
