@@ -18,7 +18,7 @@ public class Movement {
   //25x20.  Will measure the size of the arena to make making the grid easier
 	
   //global variables
-	public static int     dist    = 25   ; //Size of robot, used to move one cell
+	public static int     dist    = 25   ; //Size of cells, used to move one cell
 	public static int     degree  = 107  ; //Can set the rotation value after calibration
 	public static int     length  = 10   ; //These need values, for as many cells as there are
 	public static int     width   = 5    ; //These need values, for as many cells as there are
@@ -32,9 +32,10 @@ public class Movement {
     public static DifferentialPilot pilot = new DifferentialPilot(3.22, 19, Motor.B, Motor.C);
     public static OdometryPoseProvider opp = new OdometryPoseProvider(pilot);
 
-    Movement(int c, int r) {
+    Movement(int d, int c, int r) {
         columns = c;
         numOfRows = r;
+        dist = d;
     } 
     
     //As to not confuse with the pilot.rotate method

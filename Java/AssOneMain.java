@@ -21,6 +21,7 @@ import lejos.nxt.Motor;
 public class AssOneMain {
  
   //global variables here - templates for now
+  static int       cellSize      = 0            ; //size of cells
   static int       columns       = 0            ; //grid X axis
   static int       numOfRowCells = 0            ; //grid Y axis
   static int       loop1         = 0            ;
@@ -34,12 +35,13 @@ public class AssOneMain {
 
   public static void main(String[] args) {
     //grid values for mapping
-    columns       = 5;
-    numOfRowCells = 7;
+    columns       = 5 ;
+    numOfRowCells = 7 ;
+    cellSize      = 25;
 
     //connect to other classes
-    mapObj = new MapSystem(columns, numOfRowCells);
-    movObj = new Movement( columns, numOfRowCells);
+    mapObj = new MapSystem(cellSize, columns, numOfRowCells);
+    movObj = new Movement (cellSize, columns, numOfRowCells);
     
     //connect to RConsole
     btObj.startBtConn();
@@ -149,7 +151,8 @@ public class AssOneMain {
         
     //if at a 'limit cell', turn left instead of right
         
-  }
+     }
     
+    }
 }
 //EndOfFile

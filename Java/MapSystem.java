@@ -1,49 +1,48 @@
-import lejos.nxt.Button;
-import lejos.nxt.Motor;
-import lejos.nxt.SensorPort;
-import lejos.nxt.UltrasonicSensor;
-import lejos.nxt.TouchSensor;
 import lejos.nxt.*;
 
 public class MapSystem {
 	
-	final static int robotSize = 25;		//size of robot
-	
-   
+    //Attributes
+	static int cellSize;		            //size of cells
 	static int[][] map;                 	//map to be completed
     static int[][] C;                       //number of times a cell had been scanned
-    static double[][] P;                       //probability of a cell being occupied
-    static int[] limit; 		//highest coordinates
-	static int[] position = {0,0};			//robots position
-	static int i = 1;						//counter to be used for position, limit
-    static int obstaclePosition;
+    static double[][] P;                    //probability of a cell being occupied
+    
+    static int[] limit = new int[2]; 		//highest coordinates in map
+	static int[] position = new int[2];	    //robot's position
+	static int i = 1;						//used to switch between axes of position and limit
 
 	static int heading = 1;			        //plus or minus 1 depending on which direction the robot is facing
-	static int direction = 1;			    //direction 1-4 of where the robot is facing
+	static int direction = 1;			    //direction 1-4 of where the robot is facing (1 is forward, 4 is left).
 	
-    //variables added to compile successfully
-    static int dest;                        //distance to object ahead
+    static int dest;                        //distance to nearest obstacle/wall
+    static int obstaclePosition;            //detected position of obstacle along an axis
     static int totalCells;                  //number of cells
     static int unknownObjs = 4;             //number of obstacles not found
-    static int lastTurn = 0;                //the direction the head was last turned
-    
-    
+        
+    //Sonar Sensor Object
 	static UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
     
     //Constructor
-    MapSystem(int c, int r) {
-        map = new int[c][r]; 			//map to be completed
-        P   = new double[c][r]; 			//map to be completed
-        C   = new int[c][r]; 			//map to be completed
-        limit = new int[2];
+    MapSystem(int d, int c, int r) {
+        //input map dimensions
+        map = new int[c][r];
+        P = new double[c][r];
+        C = new int[c][r];
+        
+        //add map limits                            
         limit[0] = (c - 1);
         limit[1] = (r - 1);
+        
+        //set other variables
         totalCells = (c * r);
-        us.continuous();
+        cellSize = d;
+        
+        us.continuous();        //turn on sonar
     }
     
     /* Works out the probability of the cell
-     * ahead being occupied.
+     * ahead being occupied. No longer really useful.
      */
     public static double basicProb() {
         double x = ( (unknownObjs / totalCells) * 100);
@@ -59,7 +58,7 @@ public class MapSystem {
         dest = us.getDistance();        //scan
         updateMap();
         
-        if(dest < 30) {
+        if(dest < 30) {                 //if directly ahead
             return true;
         } else {
             return false;
@@ -72,15 +71,15 @@ public class MapSystem {
      */
     public static boolean scanLeft() {
         Motor.A.rotateTo(-650);         //rotate to left
-        leftTurn();
+        leftTurn();                     //tell map system
         
         dest = us.getDistance();        //scan
         updateMap();         
         
         Motor.A.rotateTo(0);            //rotate to front
-        rightTurn();
+        rightTurn();                    //tell map system
        
-        if(dest < 30) {
+        if(dest < 30) {                 //if directly ahead
             return true;
         } else {
             return false;
@@ -93,15 +92,15 @@ public class MapSystem {
      */
     public static boolean scanRight() {
         Motor.A.rotateTo(650);          //rotate to right
-        rightTurn();
+        rightTurn();                    //tell map system
         
         dest = us.getDistance();        //scan 
         updateMap();
         
-        Motor.A.rotateTo(0);
-        leftTurn();
+        Motor.A.rotateTo(0);            //rotate to front
+        leftTurn();                     //tell map system
         
-        if(dest < 30) {
+        if(dest < 30) {                 //if directly ahead
             return true;
         } else {
             return false;
@@ -109,10 +108,18 @@ public class MapSystem {
     }
     
     /* Updates the current position of the robot 
-     * based on it's current axis and heading.
+     * based on it's current movement axis and 
+     * heading.
      */
     public static void updatePosition() {
         position[i] = position[i] + heading;
+        
+        //incase of some error
+        if (position[i] > limit[i]) {
+            position[i] = limit[i];
+        } else if (position[i] < 0) {
+            position[i] = 0;
+        }
     }
     
     
@@ -120,6 +127,7 @@ public class MapSystem {
 	 * right turn.
 	 */
 	public static void rightTurn() {
+        //change direction
 		if (direction == 4){		//if max direction
 			direction = 1;		    //reset
 		} else {
@@ -132,21 +140,21 @@ public class MapSystem {
 			heading = -1;
 		}
 		
-		if(i == 0) {
-			i = 1;		            //y axis is 0 and x axis is 1
+		if(i == 0) {                //y axis is 1, x is 0
+			i = 1;		          
 		} else {
 			i = 0;
 		}
 	}
 	
 	/* How the map system recognises a 
-	 * right turn.
+	 * left turn.
 	 */
 	public static void leftTurn() {
-		if (direction == 1){
-			direction = 4;
+		if (direction == 1){        //if min direction
+			direction = 4;          //reset
 		} else {
-			direction--;
+			direction--;            //change direction
 		}
 		
 		if (direction < 3) {
@@ -162,20 +170,21 @@ public class MapSystem {
 		}
 	}
 	
-	/* Updates the specific part of the
-	 * map the robot thinks there is an
-	 * obstacle. 
-	 * Adds 1 where there is an obstacle
-	 * and -1 where there isn't.
+	/* Updates the specific part of the map the
+     * robot thinks there is an obstacle. 
+	 * Increments map[][] where there is an obstacle and
+     * decrements where there isn't up to the obstacle.
+     * Increments C[][] whenever that cell is updated.
+     * Passes to occupancyGrid when map is updated.
 	 */  
 	public static void updateBlock(int b) {
 		
-		if (i == 1) {								//if x axis
-			if (obstaclePosition > 0 && obstaclePosition <= limit[i]) {
-                map[position[0]][b]++;				//update map
+		if (i == 1) {								        //if x axis
+			if (b > 0 && b <= limit[i]) {                   //if obstacle within map limits
+                map[position[0]][b]++;				        //update map
                 C[position[0]][b]++;
                 occupancyGrid(position[0], b);
-            }
+            } //else dont add obstacle, just update to wall
             
 			if (heading == 1) {
 				for (int j = position[i]; j < b; j++) {		//add in empty spaces up to obstacle
@@ -185,17 +194,17 @@ public class MapSystem {
 				}
 			} else if (heading == -1) {
 				for (int j = position[i]; j > b; j--) {
-					map[position[1]][j]--;
-                    C[position[1]][j]++;
+					map[position[0]][j]--;
+                    C[position[0]][j]++;
                     occupancyGrid(position[0], j);
 				}
 			}
 		} else if (i == 0) {								//if y axis
-            if (obstaclePosition > 0 && obstaclePosition <= limit[i]) {
-                map[b][position[1]]++;				//update map
+            if (b > 0 && b <= limit[i]) {                   //if obstacle within map limits
+                map[b][position[1]]++;				        //update map
                 C[b][position[1]]++;
                 occupancyGrid(b, position[1]);
-            }
+            }  //else dont add obstacle, just update to wall
             
 			if (heading == 1) {
 				for (int j = position[i]; j < b; j++) {		//add in empty spaces up to obstacle
@@ -206,15 +215,19 @@ public class MapSystem {
 			} else if (heading == -1) {
 				for (int j = position[i]; j > b; j--) {
 					map[j][position[1]]--;
-                     occupancyGrid(j, position[1]);
+                    C[j][position[1]]++;
+                    occupancyGrid(j, position[1]);
 				}
 			}
 		}
 		
 	}
 	
+    /* Calculates the probability of a cell
+     * in the map being occupied.
+     */
     public static void occupancyGrid(int x, int y) {
-        P[x][y] = ( (double)map[x][y] + (double)C[x][y]) / (2.0 * (double)C[x][y]);    
+        P[x][y] = ((double)map[x][y] + (double)C[x][y]) / (2 * (double)C[x][y]);  
     }
     
 	/* Calculates the distance in coordinates
@@ -223,49 +236,59 @@ public class MapSystem {
 	 * map using updateBlock().
 	 */
 	public static void updateMap() {
-
-		double d = dest / robotSize;	//get number of blocks till object
-		int x = (int) Math.round(d);	//get interger of blocks till object
-        obstaclePosition = position[i] + ((x+1) * heading);
-		if(obstaclePosition > limit[i]) {				//incase of error
+       
+		double d = dest / cellSize;	        //get occupied position distance from robot
+		int x = (int) Math.ceil(d);	        //then get as integer (if x is 2, obstacle is in the second block away from robot)
+        if (dest % cellSize == 0) {
+            x++;                            //x incremented as cannot round up with mod 0
+        }
+        
+        obstaclePosition = position[i] + (x * heading);     //get map position of obstacle
+        
+		if(obstaclePosition > limit[i]) {	        //if obstacle is wall
 			obstaclePosition = limit[i] + 1;
-		} else if (obstaclePosition < 0) {
+		} else if (obstaclePosition < 0) {          //if other wall
             obstaclePosition = -1;           
         }
+        
         updateBlock(obstaclePosition);
 	}
 
-	/* Prints current map to lcd 
+	/* Prints current occupancy grid to lcd 
      * screen.
      */
     public static void printMap(int c, int r) {
         LCD.clear();
         for(int i = 0; i < r; i++) {
 			for(int j = 0; j < c; j++){
-				if (P[j][i] > 0.5) {
-                    System.out.print("1");
-                } else if (P[j][i] < 0.5) {
-                    System.out.print("0");                    
-                } else {
-                    System.out.print("-");
+				if (P[j][i] > 0.5) {                //if theres probably an object
+                    System.out.print("O");
+                } else if (P[j][i] < 0.5) {  //if theres probably not an object
+                    System.out.print("~");                    
+                } else {                            //if it gets confused
+                    System.out.print("?");
                 }
 			}
-			System.out.print('\n');
+			System.out.print('\n');                 //next layer
 		}   
     }
 	
-	/* Puts map into a string for 
-     * bluetooth
+	/* Puts raw occupancy grid into a string for 
+     * bluetooth.
      */
 	public static String getMap(int c, int r) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();     //used to append map data to string
+        
 		for(int i = 0; i < r; i++) {
 			for(int j = 0; j < c; j++){
-                sb.append(P[j][i]);
+                sb.append(P[j][i]);                 //append probability to string
+                
 			}
-			sb.append("\n");
+			sb.append("\n");                        //next layer
 		}
-		String s = sb.toString();
+        
+        //create string
+		String s = sb.toString();                
 		return s;
 
 	}
