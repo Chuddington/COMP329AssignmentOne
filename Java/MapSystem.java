@@ -16,7 +16,8 @@ public class MapSystem {
 	static int direction = 1;			    //direction 1-4 of where the robot is facing (1 is forward, 4 is left).
 	
     static int dest;                        //distance to nearest obstacle/wall
-    static int obstaclePosition;            //detected position of obstacle along an axis
+    static int obstaclePos;                 //detected position of obstacle along an axis
+    static boolean obstacle;                //whether an obstacle is detected (true) or not (false)
     static int totalCells;                  //number of cells
     static int unknownObjs = 4;             //number of obstacles not found
         
@@ -42,7 +43,7 @@ public class MapSystem {
     }
     
     /* Works out the probability of the cell
-     * ahead being occupied. No longer really useful.
+     * ahead being occupied.
      */
     public static double basicProb() {
         double x = ( (unknownObjs / totalCells) * 100);
@@ -177,56 +178,53 @@ public class MapSystem {
      * Increments C[][] whenever that cell is updated.
      * Passes to occupancyGrid when map is updated.
 	 */  
-	public static void updateBlock(int b) {
+	public static void updateBlock() {
 		
-		if (i == 1) {								        //if x axis
-			if (b > 0 && b <= limit[i]) {                   //if obstacle within map limits
-                map[position[0]][b]++;				        //update map
-                C[position[0]][b]++;
-                occupancyGrid(position[0], b);
+		if (i == 1) {								                    //if x axis
+			if (obstaclePos >= 0 && obstaclePos <= limit[i]) {          //if obstacle within map limits
+                obstacle = true;                                        //obstacle at this position        
+                occupancyGrid(position[0], obstaclePos, obstacle);      //update map
             } //else dont add obstacle, just update to wall
             
+            obstacle = false;                                           //now update where no obstacle
 			if (heading == 1) {
-				for (int j = position[i]; j < b; j++) {		//add in empty spaces up to obstacle
-					map[position[0]][j]--;
-                    C[position[0]][j]++;
-                    occupancyGrid(position[0], j);
+				for (int j = position[i]; j < obstaclePos; j++) {		//add in empty spaces up to obstacle
+					occupancyGrid(position[0], j, obstacle);
 				}
 			} else if (heading == -1) {
-				for (int j = position[i]; j > b; j--) {
-					map[position[0]][j]--;
-                    C[position[0]][j]++;
-                    occupancyGrid(position[0], j);
+				for (int j = position[i]; j > obstaclePos; j--) {
+					occupancyGrid(position[0], j, obstacle);
 				}
 			}
-		} else if (i == 0) {								//if y axis
-            if (b > 0 && b <= limit[i]) {                   //if obstacle within map limits
-                map[b][position[1]]++;				        //update map
-                C[b][position[1]]++;
-                occupancyGrid(b, position[1]);
+		} else if (i == 0) {								            //if x axis
+            if (obstaclePos >= 0 && obstaclePos <= limit[i]) {          //if obstacle within map limits
+                obstacle = true;
+                occupancyGrid(obstaclePos, position[1], obstacle);
             }  //else dont add obstacle, just update to wall
             
+            obstacle = false;
 			if (heading == 1) {
-				for (int j = position[i]; j < b; j++) {		//add in empty spaces up to obstacle
-					map[j][position[1]]--;
-                    C[j][position[1]]++;
-                    occupancyGrid(j, position[1]);
+				for (int j = position[i]; j < obstaclePos; j++) {		//add in empty spaces up to obstacle
+                    occupancyGrid(j, position[1], obstacle);
 				}
 			} else if (heading == -1) {
-				for (int j = position[i]; j > b; j--) {
-					map[j][position[1]]--;
-                    C[j][position[1]]++;
-                    occupancyGrid(j, position[1]);
+				for (int j = position[i]; j > obstaclePos; j--) {
+                    occupancyGrid(j, position[1], obstacle);
 				}
 			}
-		}
-		
+		}	
 	}
 	
     /* Calculates the probability of a cell
      * in the map being occupied.
      */
-    public static void occupancyGrid(int x, int y) {
+    public static void occupancyGrid(int x, int y, boolean obstacle) {
+        if (obstacle) {
+            map[x][y]++;
+        } else {
+            map[x][y]--;
+        }
+        C[x][y]++;
         P[x][y] = ((double)map[x][y] + (double)C[x][y]) / (2 * (double)C[x][y]);  
     }
     
@@ -237,21 +235,21 @@ public class MapSystem {
 	 */
 	public static void updateMap() {
        
-		double d = dest / cellSize;	        //get occupied position distance from robot
-		int x = (int) Math.ceil(d);	        //then get as integer (if x is 2, obstacle is in the second block away from robot)
+		float d = (float)dest / (float)cellSize;	        //get occupied position distance from robot
+		int x = (int) Math.ceil(d);	            //then get as integer (if x is 2, obstacle is in the second block away from robot)
         if (dest % cellSize == 0) {
-            x++;                            //x incremented as cannot round up with mod 0
+            x++;                                //x incremented as cannot round up with mod 0
         }
         
-        obstaclePosition = position[i] + (x * heading);     //get map position of obstacle
+        obstaclePos = position[i] + (x * heading);     //get map position of obstacle
         
-		if(obstaclePosition > limit[i]) {	        //if obstacle is wall
-			obstaclePosition = limit[i] + 1;
-		} else if (obstaclePosition < 0) {          //if other wall
-            obstaclePosition = -1;           
+		if(obstaclePos > limit[i]) {	        //if obstacle is wall
+			obstaclePos = limit[i] + 1;
+		} else if (obstaclePos < 0) {          //if other wall
+            obstaclePos = -1;           
         }
         
-        updateBlock(obstaclePosition);
+        updateBlock();
 	}
 
 	/* Prints current occupancy grid to lcd 
@@ -259,11 +257,11 @@ public class MapSystem {
      */
     public static void printMap(int c, int r) {
         LCD.clear();
-        for(int i = 0; i < r; i++) {
-			for(int j = 0; j < c; j++){
-				if (P[j][i] > 0.5) {                //if theres probably an object
+        for(int k = r - 1; k >= 0; i++) {
+			for(int j = 0; j < c; j++) {
+				if (P[j][k] >= 0.5) {                //if theres probably an object
                     System.out.print("O");
-                } else if (P[j][i] < 0.5) {  //if theres probably not an object
+                } else if (C[j][k] > 0 && P[j][k] < 0.5) {         //if theres probably not an object
                     System.out.print("~");                    
                 } else {                            //if it gets confused
                     System.out.print("?");
@@ -279,14 +277,12 @@ public class MapSystem {
 	public static String getMap(int c, int r) {
         StringBuilder sb = new StringBuilder();     //used to append map data to string
         
-		for(int i = 0; i < r; i++) {
-			for(int j = 0; j < c; j++){
-                sb.append(P[j][i]);                 //append probability to string
-                
+		for(int k = r - 1; k >= 0; i++) {
+			for(int j = 0; j < c; j++) {
+                sb.append(P[j][k]);                 //append probability to string       
 			}
 			sb.append("\n");                        //next layer
 		}
-        
         //create string
 		String s = sb.toString();                
 		return s;
