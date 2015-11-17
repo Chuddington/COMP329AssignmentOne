@@ -22,7 +22,7 @@ public class MapSystem {
     static int unknownObjs = 4;             //number of obstacles not found
         
     //Sonar Sensor Object
-	static UltrasonicSensor us = new UltrasonicSensor(SensorPort.S4);
+	static UltrasonicSensor us = new UltrasonicSensor(SensorPort.S3);
     
     //Constructor
     MapSystem(int d, int c, int r) {
@@ -41,6 +41,42 @@ public class MapSystem {
         
         us.continuous();        //turn on sonar
     }
+    
+    
+    public static boolean[] scanAll()  {
+        
+        boolean[] results = new boolean[3];
+        Motor.A.rotateTo(0);            //rotate to front
+        dest = us.getDistance();        //scan
+                
+        if(dest < 30) {               //if directly ahead
+            results[1] = true;
+        } else {
+            results[1] = false;
+        }
+        
+        Motor.A.rotateTo(-650);         //rotate to left
+        dest = us.getDistance();        //scan
+        if(dest < 30) {              //if directly ahead
+            results[0] = true;
+        } else {
+            results[0] = false;
+        }
+        
+        Motor.A.rotateTo(650);          //rotate to right        
+        dest = us.getDistance();        //scan 
+         if(dest < 30) {                 //if directly ahead
+            results[2] = true;
+        } else {
+            results[2] = false;
+        }                  
+        
+        Motor.A.rotateTo(0);            //rotate to front
+
+        return results;
+     }
+    
+    
     
     /* Works out the probability of the cell
      * ahead being occupied.
