@@ -69,6 +69,7 @@ public class AssOneMain {
     Button.waitForAnyPress();
     btObj.stringToRCon(output[0] );
     btObj.stringToRCon(output[1] );
+    btObj.stringToRCon(output[2] );
     
   }
   

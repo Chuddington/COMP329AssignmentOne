@@ -374,6 +374,7 @@ public class MapSystem {
         //create strings
 		s[0] = ob.toString();
         s[1] = cb.toString();
+        s[2] = sb.toString();
 		return s;
 
 	}
