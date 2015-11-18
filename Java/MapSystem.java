@@ -1,5 +1,19 @@
+/* MapSystem.java
+ * Mapping for ROBOT-06 Robotics Assignment 1
+ * 
+ * Author: Johnathan Edwards 200965323 with some changes and editions from ROBOT-06
+ *
+ * Final Draft: 12:32 17/11/2015
+ *  
+ */
+
 import lejos.nxt.*;
 
+/* Map system for robot. Scans left ahead and right
+ * then updates an occupancy grid based on whether 
+ * those cells are occupied or empty. Can give a string
+ * containing occupancy grid.
+ */
 public class MapSystem {
 	
     //Attributes
@@ -16,8 +30,6 @@ public class MapSystem {
 	static int direction = 1;			    //direction 1-4 of where the robot is facing (1 is forward, 4 is left).
 	
     static int dest;                        //distance to nearest obstacle/wall
-    static int obstaclePos;                 //detected position of obstacle along an axis
-    static boolean obstacle;                //whether an obstacle is detected (true) or not (false)
     static int totalCells;                  //number of cells
     static int unknownObjs = 4;             //number of obstacles not found
         
@@ -42,37 +54,41 @@ public class MapSystem {
         us.continuous();        //turn on sonar
     }
     
-    
+    /* Scans left, ahead and right. Returns
+     * array of booleans stating whether a
+     * direction has an empty cell (false)
+     * or an occupied cell (true).
+     */
     public static boolean[] scanAll()  {
         
         boolean[] results = new boolean[3];
-        Motor.A.rotateTo(0);            //rotate to front
-        dest = us.getDistance();        //scan
+        Motor.A.rotateTo(0);                    //rotate to front
+        dest = us.getDistance();                //scan
                 
-        if(dest < 30) {               //if directly ahead
+        if(dest < 30) {                         //if directly ahead
             results[1] = true;
         } else {
             results[1] = false;
         }
         
-        Motor.A.rotateTo(-650);         //rotate to left
-        dest = us.getDistance();        //scan
-        if(dest < 30) {              //if directly ahead
+        Motor.A.rotateTo(-650);                 //rotate to left
+        dest = us.getDistance();                //scan
+        if(dest < 30) {                         //if directly ahead
             results[0] = true;
         } else {
             results[0] = false;
         }
         
-        Motor.A.rotateTo(650);          //rotate to right        
-        dest = us.getDistance();        //scan 
-         if(dest < 30) {                 //if directly ahead
+        Motor.A.rotateTo(650);                  //rotate to right        
+        dest = us.getDistance();                //scan 
+         if(dest < 30) {                        //if directly ahead
             results[2] = true;
         } else {
             results[2] = false;
         }                  
         
-        Motor.A.rotateTo(0);            //rotate to front
-
+        Motor.A.rotateTo(0);                    //rotate to front
+        
         return results;
      }
     
@@ -93,7 +109,7 @@ public class MapSystem {
         Motor.A.rotateTo(0);            //rotate to front
                 
         dest = us.getDistance();        //scan
-        updateMap();
+      //  updateMap();
         
         if(dest < 30) {                 //if directly ahead
             return true;
@@ -106,12 +122,12 @@ public class MapSystem {
     /* Scans the cell to the left of 
      * the robot by turning its head
      */
-    public static boolean scanLeft() {
+   public static boolean scanLeft() {
         Motor.A.rotateTo(-650);         //rotate to left
         leftTurn();                     //tell map system
         
         dest = us.getDistance();        //scan
-        updateMap();         
+    //    updateMap();         
         
         Motor.A.rotateTo(0);            //rotate to front
         rightTurn();                    //tell map system
@@ -132,7 +148,7 @@ public class MapSystem {
         rightTurn();                    //tell map system
         
         dest = us.getDistance();        //scan 
-        updateMap();
+     //   updateMap();
         
         Motor.A.rotateTo(0);            //rotate to front
         leftTurn();                     //tell map system
@@ -149,7 +165,7 @@ public class MapSystem {
      * heading.
      */
     public static void updatePosition() {
-        position[i] = position[i] + heading;
+        position[i] = position[i] + heading;        //position is + or - 1 depending on robot's heading
         
         //incase of some error
         if (position[i] > limit[i]) {
@@ -214,7 +230,7 @@ public class MapSystem {
      * Increments C[][] whenever that cell is updated.
      * Passes to occupancyGrid when map is updated.
 	 */  
-	public static void updateBlock() {
+/*	public static void updateBlock() {
 		
 		if (i == 1) {								                    //if x axis
 			if (obstaclePos >= 0 && obstaclePos <= limit[i]) {          //if obstacle within map limits
@@ -249,78 +265,114 @@ public class MapSystem {
 				}
 			}
 		}	
-	}
+	}*/
 	
     /* Calculates the probability of a cell
      * in the map being occupied.
      */
     public static void occupancyGrid(int x, int y, boolean obstacle) {
-        if (obstacle) {
-            map[x][y]++;
-        } else {
-            map[x][y]--;
+        if (obstacle) {             //if obstacle
+            map[x][y]++;            //cell occupied
+        } else {                    
+            map[x][y]--;            //cell unoccupiued
         }
-        C[x][y]++;
-        P[x][y] = ((double)map[x][y] + (double)C[x][y]) / (2 * (double)C[x][y]);  
+        C[x][y]++;                  //increase cell scanned count
+        P[x][y] = ((double)map[x][y] + (double)C[x][y]) / (2 * (double)C[x][y]);    //update occupancy grid
     }
     
-	/* Calculates the distance in coordinates
-	 * to obstacle, then the actual coordinate
-	 * of the obstacle then puts it into the
-	 * map using updateBlock().
+	/* Updates grid cells ahead, left and right
+     * of position of the robot using boolean
+     * giving results of a scan and the robots
+     * position.
 	 */
-	public static void updateMap() {
+	public static void updateMap(boolean[] results) {
        
-		float d = (float)dest / (float)cellSize;	        //get occupied position distance from robot
-		int x = (int) Math.ceil(d);	            //then get as integer (if x is 2, obstacle is in the second block away from robot)
-        if (dest % cellSize == 0) {
-            x++;                                //x incremented as cannot round up with mod 0
+        int gridPosition;       //scanned grid position
+       
+        if(i == 0) {                                //if x axis
+            gridPosition = position[1] + heading;                       //left grid cell
+            if (gridPosition >= 0 && gridPosition <= limit[1]) {        //if within limits
+                occupancyGrid(position[0], gridPosition, results[0]);
+            }
+            
+            gridPosition = position[0] + heading;                       //grid cell ahead
+            if (gridPosition >= 0 && gridPosition <= limit[0]) {
+                occupancyGrid(gridPosition, position[1], results[1]);
+            }
+            
+            gridPosition = position[1] + (heading * -1);                //right grid cell
+            if (gridPosition >= 0 && gridPosition <= limit[1]) {
+                occupancyGrid(position[0], gridPosition, results[2]);
+            }    
         }
-        
-        obstaclePos = position[i] + (x * heading);     //get map position of obstacle
-        
-		if(obstaclePos > limit[i]) {	        //if obstacle is wall
-			obstaclePos = limit[i] + 1;
-		} else if (obstaclePos < 0) {          //if other wall
-            obstaclePos = -1;           
-        }
-        
-        updateBlock();
+    
+        if(i == 1) {
+            gridPosition = position[0] + (heading * -1);                //left grid cell
+            if (gridPosition >= 0 && gridPosition <= limit[0]) {
+                occupancyGrid(gridPosition, position[1], results[0]);  
+            }
+            
+            gridPosition = position[1] + heading;                       //grid cell ahead
+            if (gridPosition >= 0 && gridPosition <= limit[1]) {
+                occupancyGrid(position[0], gridPosition, results[1]);
+            }
+            
+            gridPosition = position[0] + heading;                       //right grid cell
+            if (gridPosition >= 0 && gridPosition <= limit[0]) {
+                occupancyGrid(gridPosition, position[1], results[2]);
+            }    
+        }  
 	}
 
 	/* Prints current occupancy grid to lcd 
-     * screen.
+     * screen. Removed as constant printing
+     * is slow on the bluetooth.
      */
-    public static void printMap(int c, int r) {
+   /* public static void printMap(int c, int r) {
         LCD.clear();
-        for(int k = r - 1; k >= 0; i++) {
+        for(int k = r - 1; k >= 0; k--) {
 			for(int j = 0; j < c; j++) {
-				if (P[j][k] >= 0.5) {                //if theres probably an object
+				if (P[j][k] >= 0.5) {                           //if theres probably an object
                     System.out.print("O");
-                } else if (C[j][k] > 0 && P[j][k] < 0.5) {         //if theres probably not an object
+                } else if (C[j][k] > 0 && P[j][k] < 0.5) {      //if theres probably not an object
                     System.out.print("~");                    
-                } else {                            //if it gets confused
+                } else {                                        //if it gets confused
                     System.out.print("?");
                 }
 			}
-			System.out.print('\n');                 //next layer
+			System.out.print('\n');       //next y coord
 		}   
-    }
+    }*/
 	
 	/* Puts raw occupancy grid into a string for 
      * bluetooth.
      */
-	public static String getMap(int c, int r) {
-        StringBuilder sb = new StringBuilder();     //used to append map data to string
+	public static String[] getMap(int c, int r) {
+        StringBuilder ob = new StringBuilder();     //used to append occupancy grid to string
+        StringBuilder cb = new StringBuilder();     //used to append count grid to string
+        String[] s = new String[2];
         
-		for(int k = r - 1; k >= 0; i++) {
+        ob.append("Occupancy Grid:\n");             //append information to string
+        cb.append("Count Grid:\n");
+        
+		for(int k = r - 1; k >= 0; k--) {
 			for(int j = 0; j < c; j++) {
-                sb.append(P[j][k]);                 //append probability to string       
+                if (P[j][k] >= 0.5) {                           //if theres probably an object
+                    sb.append("O");
+                } else if (C[j][k] > 0 && P[j][k] < 0.5) {      //if theres probably not an object
+                    sb.append("~");                    
+                } else {                                        //if it gets confused
+                    sb.append("?");
+                };                                                 
+                cb.append(C[j][k] );                            //append count to string
 			}
-			sb.append("\n");                        //next layer
+            //next y coord
+			ob.append("\n");                        
+            cb.append("\n");                    
 		}
-        //create string
-		String s = sb.toString();                
+        //create strings
+		s[0] = ob.toString();
+        s[1] = cb.toString();
 		return s;
 
 	}

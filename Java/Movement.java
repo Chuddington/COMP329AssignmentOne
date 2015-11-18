@@ -18,7 +18,7 @@ public class Movement {
   //25x20.  Will measure the size of the arena to make making the grid easier
 	
   //global variables
-	public static int     dist    = 25   ; //Size of cells, used to move one cell
+	public static int     dist    = 0   ; //Size of cells, used to move one cell
 	public static int     degree  = 107  ; //Can set the rotation value after calibration
 	public static int     length  = 10   ; //These need values, for as many cells as there are
 	public static int     width   = 5    ; //These need values, for as many cells as there are
@@ -71,9 +71,9 @@ public class Movement {
 	public static void nextCell(MapSystem ms){
 	
 		pilot.travel(dist);  //Moves one cell over; increments array width value
-        btVar.poseToRCon(opp.getPose() ); //parameter may not work - check
+        //btVar.poseToRCon(opp.getPose() ); //parameter may not work - check
         ms.updatePosition(); //updates the robot's current position in the mapping system
-        ms.printMap(columns, numOfRows);
+       // ms.printMap(columns, numOfRows);
 	}
     
     public static void nextCell(){
@@ -81,25 +81,21 @@ public class Movement {
 		pilot.travel(dist);  //Moves one cell over; increments array width value
 	}
 
+    //Method to run the robot in a square
+    //tests the rotation and movement of the robot
+    //Allowing variables to be corrected before running full program
+    
 	public static void calibrate(){
 	
-		TouchSensor leftBump = new TouchSensor(SensorPort.S2);
-		TouchSensor rightBump = new TouchSensor(SensorPort.S1);
+		pilot.travel(dist);
+        pilot.rotate(degree);
+        pilot.travel(dist);
+        pilot.rotate(degree);
+        pilot.travel(dist);
+        pilot.rotate(degree);
+        pilot.travel(dist);
+        pilot.rotate(degree);
 		
-		System.out.println("Press right bumper to start");
-		
-		if(rightBump.isPressed() ) {
-            pilot.rotate(90);
-		}
-		System.out.println("Increase degree with R.bumper.  L.Bumper to exit");
-		if(rightBump.isPressed() ) {
-			degree += 5; //Increases rotation degree if needed
-			System.out.println("Reset the robot to straight");
-			calibrate();
-		}
-		if(leftBump.isPressed() ) {	
-			return;
-		}
 	}
 
 

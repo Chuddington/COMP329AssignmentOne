@@ -35,9 +35,9 @@ public class AssOneMain {
 
   public static void main(String[] args) {
     //grid values for mapping
-    columns       = 5 ;
-    numOfRowCells = 7 ;
-    cellSize      = 25;
+    columns       = 4 ;
+    numOfRowCells = 5 ;
+    cellSize      = 30;
 
     //connect to other classes
     mapObj = new MapSystem(cellSize, columns, numOfRowCells);
@@ -45,7 +45,9 @@ public class AssOneMain {
     
     //connect to RConsole
     btObj.startBtConn();
+    System.out.println("Press Any Button");
     Button.waitForAnyPress();
+    LCD.clear();
             
     //for each column
     for(loop1 = 0; loop1 < columns; loop1++) {
@@ -53,12 +55,21 @@ public class AssOneMain {
       for(loop2 = 0; loop2 < numOfRowCells; loop2++) {
         movRow(); //scan and move method
       }
+      if(loop1 == (columns - 1) ) {
+          break;
+      }
       if(loop1 % 2 == 0) { //if the robot moves along the Y axis positively
         movCol(true) ;     //turn right into the new column
       } else {
         movCol(false);     //turn left  into the new column
       }
     }
+    
+    String[] output = mapObj.getMap(columns, numOfRowCells);
+    Button.waitForAnyPress();
+    btObj.stringToRCon(output[0] );
+    btObj.stringToRCon(output[1] );
+    
   }
   
   //Method scans input and maps it; if obstacle is in front, left and right,
@@ -67,22 +78,24 @@ public class AssOneMain {
   public static void movRow() {
     double nextCell = mapObj.basicProb(); //work out probability
     //output to RConsole through BlueTooth
-    btObj.stringToRCon("Object Probability in next Cell: %2f" + nextCell);
+    //btObj.stringToRCon("Object Probability in next Cell: %2f" + nextCell);
+    
+   // mapObj.printMap(columns, numOfRowCells);
 
     //sonar scan around of the robot
     boolean[] scanResults = new boolean[3];
     scanResults = mapObj.scanAll();
-    LCD.drawString("Scan Results: " + scanResults[0] + ", " + scanResults[1] + ", " + scanResults[2], 0, 1);
-    btObj.stringToRCon("Scan Results: " + scanResults[0] + ", " + scanResults[1] + ", " + scanResults[2]);
+    mapObj.updateMap(scanResults);
+    //btObj.stringToRCon("Scan Results: " + scanResults[0] + ", " + scanResults[1] + ", " + scanResults[2]);
     //mapObj.printMap(columns, numOfRowCells);
         
-    if(objAhead) { //if there's an obstacle in front
+    if(scanResults[1] ) { //if there's an obstacle in front
       //if there's an obstacle to the left & right.  i.e. a dead end
-      if(objLeft && objRight) {
-        turnAround(objLeft, mapObj, movObj); //move backwards
+      if(scanResults[0] && scanResults[2] ) {
+        turnAround(scanResults[2], mapObj, movObj); //move backwards
       } else {
         //call movAround() method to navigate around the obstacle
-        movAround( objRight, mapObj, movObj);
+        movAround( scanResults[1], mapObj, movObj);
       }
     } else {
       movObj.nextCell(mapObj); //move forward a cell
@@ -131,17 +144,16 @@ public class AssOneMain {
     movRow()   ; //move forward
 
     //check for empty adjacent space
-    objLeft  = mapObj.scanLeft() ;
-    objRight = mapObj.scanRight();
-
+    boolean[] scanResults = new boolean[3];
+    scanResults = mapObj.scanAll();
     //Move to said empty space
-    if(objLeft && !objRight) { //Obstacle on the Left
-      mv.turn(objLeft,  ms);   //turn right
+    if(scanResults[0] && !scanResults[2]) { //Obstacle on the Left
+      mv.turn(scanResults[0],  ms);   //turn right
       movRow();
     } else { //Obstacle on the Right
-      mv.turn(!objRight, ms);  //turn left
+      mv.turn(!scanResults[2], ms);  //turn left
       movRow();
-      mv.turn(!objRight, ms);
+      mv.turn(!scanResults[2], ms);
       movRow();
     //move forward 2 cells, scanning as we go
     //if an obstacle is still on the same axis as the first

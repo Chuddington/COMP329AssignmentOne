@@ -5,6 +5,12 @@ import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.TouchSensor;
 import lejos.nxt.*;
 
+/*
+ * This is a different implementation of mapping - it is not used in the final
+ * program.  It was used to help clarify specific methods within the currently
+ * used mapping system.
+ */
+
 public class MichaelsMapSystem {
   
   final static int     robotSize      = 25   ; //Used for travelling distance
@@ -245,6 +251,21 @@ public class MichaelsMapSystem {
   
   //Puts current map to string for RConsole
   public static String getMap(int[][] target, int c, int r) {
+    StringBuilder sb = new StringBuilder();
+
+    //for each row (Y axis) going backwards for output layout purposes
+    for(int loop1 = (yLimit - 1); loop1 >= 0; --loop1) {
+      //for each cell in the current row
+      for(int loop2 = (xLimit - 1); loop2 >= 0; --loop2) {
+        sb.append(target[loop2][loop1] ); //concatenate element to String Builder
+        sb.append(" ") ; //space added for layout purposes
+      }
+      sb.append("\n")  ; //newline to indicate different row
+    }
+    return sb.toString();
+  }
+  
+  public static String getMap(double[][] target, int c, int r) {
     StringBuilder sb = new StringBuilder();
 
     //for each row (Y axis) going backwards for output layout purposes
