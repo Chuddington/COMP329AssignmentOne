@@ -350,7 +350,8 @@ public class MapSystem {
 	public static String[] getMap(int c, int r) {
         StringBuilder ob = new StringBuilder();     //used to append occupancy grid to string
         StringBuilder cb = new StringBuilder();     //used to append count grid to string
-        String[] s = new String[2];
+        StringBuilder sb = new StringBuilder();     //used to append state grid to string
+        String[] s = new String[3];
         
         ob.append("Occupancy Grid:\n");             //append information to string
         cb.append("Count Grid:\n");
